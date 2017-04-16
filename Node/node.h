@@ -20,5 +20,6 @@ typedef struct {
 
 // Utility functions
 int Node_init(Node *node, uint32_t id, Sensor *sensor_array, Comms_module *comms_module);
+void Node_task(void *param);
 
 #endif /* NODE_H_ */

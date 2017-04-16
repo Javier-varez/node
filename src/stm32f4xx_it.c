@@ -12,7 +12,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx.h"
 #ifdef USE_RTOS_SYSTICK
-#include <cmsis_os.h>
+#include "cmsis_os.h"
 #endif
 #include "stm32f4xx_it.h"
 

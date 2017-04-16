@@ -11,39 +11,18 @@
 
 #include "stm32f4xx.h"
 #include "init_periph.h"
-#include <stdlib.h>
-#include "LList.h"
-
 #include "node.h"
-#include "sensor_list.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
 
 void InitClk();
 
+// Variables globales
+
 I2C_HandleTypeDef hi2c;
 DMA_HandleTypeDef hdma;
-
-void addSensor(LListElement **head, uint8_t index) {
-	Sensor *sensor = (Sensor*)malloc(sizeof(Sensor));
-	if (sensor == NULL) return;
-
-	if (discoverable_devices[index]->init(sensor, &hi2c) == 0) {
-		sensor->func_tbl->init(sensor);
-
-		if (*head == NULL) {
-			*head = LList_CreateList((void *)sensor);
-		} else {
-			LList_AppendElement(*head, (void*) sensor);
-		}
-	}
-}
-
-void readSensors(LListElement *head) {
-	while(head != NULL) {
-		Sensor *sensor = (Sensor*)head->content;
-		sensor->func_tbl->read(sensor, sensor->out_data);
-		head = head->nextElement;
-	}
-}
+LListElement *sensor_list = NULL;
 
 int main(void)
 {
@@ -51,27 +30,15 @@ int main(void)
 	InitClk();
 
 	i2c_init(&hi2c, &hdma);
+	sensor_discoverDevicesOnI2CBus(&sensor_list, &hi2c);
 
-	LListElement *head = NULL;
-
-	Sensor probe_sensor;
-	uint8_t i = 0;
-	while(discoverable_devices[i] != NULL) {
-		if (discoverable_devices[i]->init(&probe_sensor, &hi2c) == 0) {
-			if (probe_sensor.func_tbl->probe(&probe_sensor) == 0) {
-				discoverable_devices[i]->remove(&probe_sensor);
-				addSensor(&head, i);
-			} else {
-				discoverable_devices[i]->remove(&probe_sensor);
-			}
-		}
-		i++;
+	if (xTaskCreate(Node_task, "node_task", 1000, (void*)sensor_list, 5, NULL) != pdPASS) {
+		while(1);
 	}
 
-	for(;;) {
-		readSensors(head);
-		HAL_Delay(2000);
-	}
+	vTaskStartScheduler();
+
+	for(;;);
 }
 
 
