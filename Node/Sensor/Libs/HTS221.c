@@ -144,8 +144,11 @@ int HTS221_read_regs(Sensor *sensor, void* data) {
 	int16_t reg_data[2];
 
 	rc = HAL_I2C_Mem_Read(sensor->data.i2c.hi2c, sensor->data.i2c.dev_addr,
-			  	  	 	  sensor->data.i2c.read_addr, sensor->data.i2c.read_addr_size,
-						  (uint8_t*)reg_data, sensor->data.i2c.read_size, 1000);
+						  HUMIDITY_OUT_L_ADDR | AUTO_INCREMENT_ADDR, sensor->data.i2c.read_addr_size,
+						  (uint8_t*)&reg_data[0], sizeof(int16_t), 1000);
+	rc |= HAL_I2C_Mem_Read(sensor->data.i2c.hi2c, sensor->data.i2c.dev_addr,
+						   TEMP_OUT_L_ADDR | AUTO_INCREMENT_ADDR, sensor->data.i2c.read_addr_size,
+						   (uint8_t*)&reg_data[1], sizeof(int16_t), 1000);
 
 	HTS221_Out_Data *out_data = (HTS221_Out_Data*) data;
 	out_data->temperature = cal->T_A * (float)reg_data[1] + cal->T_B;

@@ -36,6 +36,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/LinkedList&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor/Libs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module&quot;"/>									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module/Libs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc/Legacy}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/Utilities/Fonts}&quot;"/>
@@ -110,6 +111,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/LinkedList&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor/Libs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module&quot;"/>									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module/Libs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc/Legacy}&quot;"/>
@@ -203,6 +205,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/LinkedList&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor/Libs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module&quot;"/>									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module/Libs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc/Legacy}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/Utilities/Fonts}&quot;"/>
@@ -277,6 +280,7 @@
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/LinkedList&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Sensor/Libs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module&quot;"/>									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/Comms_module/Libs&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/HAL_Driver/Inc/Legacy}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/Utilities/Fonts}&quot;"/>
