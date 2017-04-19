@@ -132,14 +132,24 @@ int spi_init(SPI_HandleTypeDef *hspi) {
 }
 
 int gpio_init() {
+
 	GPIO_InitTypeDef gpio;
 
+	// CE PIN (nRF24L01)
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	gpio.Pull = GPIO_NOPULL;
 	gpio.Pin = GPIO_PIN_5;
 	gpio.Speed = GPIO_SPEED_FAST;
 
+	HAL_GPIO_Init(GPIOA, &gpio);
+
+	// INT PIN (nRF24L01)
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	gpio.Mode = GPIO_MODE_IT_FALLING;
+	gpio.Pull = GPIO_NOPULL;
+	gpio.Pin = GPIO_PIN_3;
+	gpio.Speed = GPIO_SPEED_FAST;
 	HAL_GPIO_Init(GPIOA, &gpio);
 
 	return 0;

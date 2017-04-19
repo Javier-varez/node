@@ -58,12 +58,14 @@
 // Bit definitions
 #define 	CONFIG_PRIM_RX		0x01
 #define 	CONFIG_PWR_UP		0x02
-#define 	CONFIG_EN_CRC		0x03
+#define 	CONFIG_EN_CRC		0x08
 
 #define 	RF_SETUP_RF_DR		0x08
+#define 	RF_SETUP_LNA_HCURR	0x01
 
 #define 	STATUS_RX_DR		0x40
 #define 	STATUS_TX_DS		0x20
+#define 	STATUS_MAX_RT		0x10
 
 #define 	ADDR_LENGTH			5
 
@@ -101,6 +103,10 @@ typedef struct {
 
 int nRF24L01_init(nRF24L01 *module);
 int nRF24L01_setMode(nRF24L01 *module, nRF24L01_Mode mode);
+
+int nRF24L01_powerUp(nRF24L01* module);
+
+int nRF24L01_transmit(nRF24L01 *module, uint8_t *payload);
 
 int nRF24L01_pollForRXPacket(nRF24L01 *module);
 int nRF24L01_pollForTXPacket(nRF24L01 *module);

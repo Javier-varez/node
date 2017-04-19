@@ -6,6 +6,8 @@
  */
 
 #include "nRF24L01.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 #define nRF24L01_SPI_TIMEOUT 1000
 
@@ -16,24 +18,21 @@ int nRF24L01_init(nRF24L01 *module) {
 	HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_RESET);
 
 	// Wait POR just in case
-	HAL_Delay(10);
+	HAL_Delay(20);
 
 	// Power up, set mode, enable CRC (1 bit)
-	uint8_t reg = CONFIG_PWR_UP | CONFIG_EN_CRC | module->configuration.mode;
+	uint8_t reg = CONFIG_EN_CRC | module->configuration.mode;
 	nRF24L01_writeRegister(module, CONFIG, &reg, 1);
 
-	// Delay 2ms to provide powerup
-	HAL_Delay(2);
-
-	// Setup automatic retransmission to 500us delay to allow 32 bytes payloads
-	reg = 0x13;
+	// Setup automatic retransmission to 1500us delay to allow 32 bytes payloads
+	reg = 0x4f;
 	nRF24L01_writeRegister(module, SETUP_RETR, &reg, 1);
 
 	// Configure channel
 	nRF24L01_writeRegister(module, RF_CH, &module->configuration.channel, 1);
 
 	// Configure PA
-	reg = RF_SETUP_RF_DR | (module->configuration.output_power << 1);
+	reg = (module->configuration.output_power << 1) | RF_SETUP_LNA_HCURR;
 	nRF24L01_writeRegister(module, RF_SETUP, &reg, 1);
 
 	// Configure TX address
@@ -42,7 +41,42 @@ int nRF24L01_init(nRF24L01 *module) {
 	// Configure RX address (PIPE 0)
 	nRF24L01_writeRegister(module, RX_ADDR_P0, module->configuration.addr, ADDR_LENGTH);
 
+	// Configure
+	reg = 32; // Set RX payload size
+	nRF24L01_writeRegister(module, RX_PW_P0, &reg, 1);
+
+	reg = 0x01; // Enable pipe 0
+	nRF24L01_writeRegister(module, EN_RXADDR, &reg, 1);
+
+	HAL_GPIO_WritePin(module->CSN.port, module->CSN.pin, GPIO_PIN_RESET);
+	nRF24L01_sendCommand(module, FLUSH_TX);
+	HAL_GPIO_WritePin(module->CSN.port, module->CSN.pin, GPIO_PIN_SET);
+
+	HAL_GPIO_WritePin(module->CSN.port, module->CSN.pin, GPIO_PIN_RESET);
+	nRF24L01_sendCommand(module, FLUSH_RX);
+	HAL_GPIO_WritePin(module->CSN.port, module->CSN.pin, GPIO_PIN_SET);
+
+	reg = STATUS_RX_DR | STATUS_TX_DS | STATUS_MAX_RT;
+	nRF24L01_writeRegister(module, STATUS, &reg, 1);
+
+	nRF24L01_readRegister(module, STATUS, &reg, 1);
+
+	nRF24L01_powerUp(module);
+
 	return rc;
+}
+
+int nRF24L01_powerUp(nRF24L01* module) {
+	uint8_t reg;
+	// Power up
+	nRF24L01_readRegister(module, CONFIG, &reg, 1);
+	reg |= CONFIG_PWR_UP;
+	nRF24L01_writeRegister(module, CONFIG, &reg, 1);
+
+	// Delay more than 2ms to provide powerup
+	HAL_Delay(4);
+
+	return 0;
 }
 
 int nRF24L01_setMode(nRF24L01 *module, nRF24L01_Mode mode) {
@@ -64,8 +98,9 @@ int nRF24L01_setMode(nRF24L01 *module, nRF24L01_Mode mode) {
 int nRF24L01_transmit(nRF24L01 *module, uint8_t *payload) {
 	uint8_t rc = 0;
 	rc = nRF24L01_writePayload(module, payload, 32); // 32 bytes payload
+#warning TODO: Implement CE signal with timer
 	HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_SET);
-	HAL_Delay(1);
+	vTaskDelay(1/portTICK_PERIOD_MS);
 	HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_RESET);
 
 	return rc;
@@ -89,7 +124,7 @@ int nRF24L01_pollForRXPacket(nRF24L01 *module) {
 		rc = nRF24L01_writeRegister(module, STATUS, &status, 1);
 	}
 
-	HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_RESET);
 
 	return rc;
 }

@@ -11,15 +11,16 @@
 #include "stm32f4xx.h"
 #include "sensor.h"
 #include "Comms_module.h"
+#include "init_periph.h"
 
 typedef struct {
 	uint8_t id;
-	Sensor *sensor_ptr;
-	Comms_module *comms;
+	LListElement *sensor_list; // Linked list
+	Comms_module comms;
 } Node;
 
 // Utility functions
-int Node_init(Node *node, uint32_t id, Sensor *sensor_array, Comms_module *comms_module);
+int Node_init(Node *node, uint32_t id);
 void Node_task(void *param);
 
 #endif /* NODE_H_ */
