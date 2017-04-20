@@ -7,6 +7,7 @@
 
 #include "HTS221.h"
 #include <stdlib.h>
+#include <string.h>
 
 Sensor_I2C_Probe_Intf HTS221_intf = {
 	.init = HTS221_init,
@@ -157,10 +158,15 @@ int HTS221_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
+void HTS221_packData(Sensor *sensor, uint8_t *data) {
+	memcpy(data, sensor->out_data, sizeof(HTS221_Out_Data));
+}
+
 static Sensor_Func_Table HTS221_func_table = {
 	.probe = i2c_sensor_probe,
 	.read = HTS221_read_regs,
 	.init = HTS221_init_regs,
+	.packData = HTS221_packData,
 };
 
 int HTS221_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {

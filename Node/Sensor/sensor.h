@@ -30,7 +30,8 @@ typedef struct sensor_struct Sensor;
 typedef struct sensor_fuct_tbl {
 	int (*probe)(Sensor *);
 	int (*init)(Sensor *);
-	int (*read)(Sensor *, void *data);
+	int (*read)(Sensor *, void *);
+	void (*packData)(Sensor *, uint8_t *);
 } Sensor_Func_Table;
 
 typedef union {

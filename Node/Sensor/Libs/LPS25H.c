@@ -7,6 +7,7 @@
 
 #include "LPS25H.h"
 #include <stdlib.h>
+#include <string.h>
 
 Sensor_I2C_Probe_Intf LPS25H_intf = {
 	.init = LPS25H_init,
@@ -144,12 +145,15 @@ int LPS25H_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
-
+void LPS25H_packData(Sensor *sensor, uint8_t *data) {
+	memcpy(data, sensor->out_data, sizeof(LPS25H_Out_Data));
+}
 
 static Sensor_Func_Table LPS25H_func_table = {
 	.probe = i2c_sensor_probe,
 	.read = LPS25H_read_regs,
 	.init = i2c_sensor_init_regs,
+	.packData = LPS25H_packData
 };
 
 int LPS25H_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {

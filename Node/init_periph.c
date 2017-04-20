@@ -131,6 +131,34 @@ int spi_init(SPI_HandleTypeDef *hspi) {
 	return rc;
 }
 
+int uart_init(UART_HandleTypeDef *huart) {
+	uint8_t rc = 0;
+	__HAL_RCC_USART1_CLK_ENABLE();
+
+	huart->Init.BaudRate = 115200;
+	huart->Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart->Init.Mode = UART_MODE_TX_RX;
+	huart->Init.OverSampling = UART_OVERSAMPLING_16;
+	huart->Init.Parity = UART_PARITY_NONE;
+	huart->Init.StopBits = UART_STOPBITS_1;
+	huart->Init.WordLength = UART_WORDLENGTH_8B;
+	huart->Instance = USART1;
+	rc = HAL_UART_Init(huart);
+
+	GPIO_InitTypeDef gpio;
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	gpio.Mode = GPIO_MODE_AF_PP;
+	gpio.Alternate = GPIO_AF7_USART1;
+	gpio.Pin = GPIO_PIN_10 | GPIO_PIN_15;
+	gpio.Pull = GPIO_NOPULL;
+	gpio.Speed = GPIO_SPEED_HIGH;
+
+	HAL_GPIO_Init(GPIOA, &gpio);
+
+	return rc;
+}
+
 int gpio_init() {
 
 	GPIO_InitTypeDef gpio;

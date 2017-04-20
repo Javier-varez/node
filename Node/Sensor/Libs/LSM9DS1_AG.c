@@ -7,6 +7,7 @@
 
 #include "LSM9DS1_AG.h"
 #include <stdlib.h>
+#include <string.h>
 
 Sensor_I2C_Probe_Intf LSM9DS1_AG_intf = {
 	.init = LSM9DS1_AG_init,
@@ -131,10 +132,15 @@ int LSM9DS1_AG_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
+void LSM9DS1_AG_packData(Sensor *sensor, uint8_t *data) {
+	memcpy(data, sensor->out_data, sizeof(LSM9DS1_AG_Out_Data));
+}
+
 static Sensor_Func_Table LSM9DS1_AG_func_table = {
 	.probe = i2c_sensor_probe,
 	.read = LSM9DS1_AG_read_regs,
 	.init = i2c_sensor_init_regs,
+	.packData = LSM9DS1_AG_packData
 };
 
 

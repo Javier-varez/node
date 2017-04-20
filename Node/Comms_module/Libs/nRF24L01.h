@@ -112,6 +112,7 @@ int nRF24L01_pollForRXPacket(nRF24L01 *module);
 int nRF24L01_pollForTXPacket(nRF24L01 *module);
 
 int nRF24L01_writePayload(nRF24L01 *module, uint8_t *buf, uint8_t len);
+int nRF24L01_readPayload(nRF24L01 *module, uint8_t *buf, uint8_t len);
 int nRF24L01_readRegister(nRF24L01 *module, uint8_t reg, uint8_t *buf, uint8_t len);
 int nRF24L01_writeRegister(nRF24L01 *module, uint8_t reg, uint8_t *buf, uint8_t len);
 

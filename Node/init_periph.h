@@ -12,6 +12,7 @@
 
 int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma);
 int spi_init(SPI_HandleTypeDef *hspi);
+int uart_init(UART_HandleTypeDef *huart);
 int gpio_init();
 
 #endif /* INIT_PERIPH_H_ */
