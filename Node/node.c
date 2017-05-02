@@ -130,7 +130,7 @@ void Node_task(void *param) {
 		sensor_readSensors(sensor_list);
 		sensor_sendSensorData(sensor_list, &node->comms.device, node->id);
 
-
+		Node_WFI();
 		//vTaskDelayUntil(&lastWakeTime, 2000/portTICK_PERIOD_MS);
 	}
 }
