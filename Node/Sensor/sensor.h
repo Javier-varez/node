@@ -8,6 +8,9 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
+#include "FreeRTOS.h"
+#include "task.h"
+
 #include "LList.h"
 
 #include "analog_sensor.h"
@@ -16,6 +19,7 @@
 #include "sensor_list.h"
 
 #define NAME_MAXLEN 15
+#define sensor_delay(x) (vTaskDelay(x/portTICK_PERIOD_MS))
 
 typedef enum {
 	SI_Analog,
@@ -32,6 +36,8 @@ typedef struct sensor_fuct_tbl {
 	int (*init)(Sensor *);
 	int (*read)(Sensor *, void *);
 	void (*packData)(Sensor *, uint8_t *);
+	int (*powerDown)(Sensor *);
+	int (*powerUp)(Sensor *);
 } Sensor_Func_Table;
 
 typedef union {

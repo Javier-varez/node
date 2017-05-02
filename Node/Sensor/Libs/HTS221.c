@@ -40,6 +40,8 @@ Sensor_I2C_Probe_Intf HTS221_intf = {
 #define 	T0_OUT_ADDR				0x3C
 #define 	T1_OUT_ADDR				0x3E
 
+#define 	STATUS_REG				0x27
+
 #define		AUTO_INCREMENT_ADDR		0x80
 
 /* Bit definitions */
@@ -64,6 +66,9 @@ Sensor_I2C_Probe_Intf HTS221_intf = {
 #define 	CTRL_REG3_PP_OD_POS		0x06
 #define 	CTRL_REG3_DRDY_EN		0x04
 #define 	CTRL_REG3_DRDY_EN_POS	0x02
+
+#define 	STATUS_REG_H_DA			0x02
+#define 	STATUS_REG_T_DA			0x01
 
 static Sensor_I2C_Init_Pair HTS221_reg_pairs[] = {
 	{
@@ -174,7 +179,6 @@ int HTS221_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {
 					HUMIDITY_OUT_L_ADDR | AUTO_INCREMENT_ADDR, sizeof(uint8_t), 2 * sizeof(int16_t),
 					WHO_AM_I, HTS221_DEV_ID);
 
-#warning use of malloc here.
 	sensor->custom = malloc(sizeof(HTS221_Calibration_Data));
 	if (sensor->custom == NULL) rc = 1;
 	else {

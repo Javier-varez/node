@@ -67,6 +67,10 @@ Sensor_I2C_Probe_Intf LSM9DS1_M_intf = {
 #define 	CTRL_REG5_FAST_READ		0x80
 #define		CTRL_REG5_BDU			0x40
 
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Initialization //////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
 static Sensor_I2C_Init_Pair LSM9DS1_M_reg_pairs[] = {
 	{
 		.reg = CTRL_REG1,
@@ -102,8 +106,52 @@ static Sensor_I2C_Init LSM9DS1_M_init_array = {
 	.data_size = sizeof(uint8_t), // Byte data
 };
 
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Power Down //////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+static Sensor_I2C_Init_Pair LSM9DS1_M_powerDown_reg_pairs[] = {
+	{
+		.reg = CTRL_REG3,
+		// Continuous conversion mode, PowerDown mode
+		.value = CTRL_REG3_LP | (0x03 << CTRL_REG3_MD_POS),
+	},
+};
+
+static Sensor_I2C_Power LSM9DS1_M_powerDown_array = {
+	.array = LSM9DS1_M_powerDown_reg_pairs,
+	.size = SIZE_OF_INIT_ARRAY(LSM9DS1_M_powerDown_reg_pairs),
+	.reg_size = sizeof(uint8_t), // Byte addr
+	.data_size = sizeof(uint8_t), // Byte data
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Power Up ////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+static Sensor_I2C_Init_Pair LSM9DS1_M_powerUp_reg_pairs[] = {
+	{
+		.reg = CTRL_REG3,
+		// Continuous conversion mode, Low power mode
+		.value = CTRL_REG3_LP | (0x00 << CTRL_REG3_MD_POS),
+	},
+};
+
+static Sensor_I2C_Power LSM9DS1_M_powerUp_array = {
+	.array = LSM9DS1_M_powerUp_reg_pairs,
+	.size = SIZE_OF_INIT_ARRAY(LSM9DS1_M_powerUp_reg_pairs),
+	.reg_size = sizeof(uint8_t), // Byte addr
+	.data_size = sizeof(uint8_t), // Byte data
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Functions ///////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
 int LSM9DS1_M_read_regs(Sensor *sensor, void* data) {
 	HAL_StatusTypeDef rc = HAL_OK;
+
+	sensor_delay(15);
 
 	LSM9DS1_M_Out_Data * out_data = (LSM9DS1_M_Out_Data*) data;
 
@@ -122,7 +170,9 @@ static Sensor_Func_Table LSM9DS1_M_func_table = {
 	.probe = i2c_sensor_probe,
 	.read = LSM9DS1_M_read_regs,
 	.init = i2c_sensor_init_regs,
-	.packData = LSM9DS1_M_packData
+	.packData = LSM9DS1_M_packData,
+	.powerDown = i2c_sensor_powerDown,
+	.powerUp = i2c_sensor_powerUp
 };
 
 
@@ -134,6 +184,9 @@ int LSM9DS1_M_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {
 		sensor->out_data = malloc(sizeof(LSM9DS1_M_Out_Data));
 		if (sensor->out_data == NULL) rc = 0;
 	}
+
+	sensor->data.i2c.powerup = &LSM9DS1_M_powerUp_array;
+	sensor->data.i2c.powerdown = &LSM9DS1_M_powerDown_array;
 
 	return rc;
 }

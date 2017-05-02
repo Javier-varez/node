@@ -90,18 +90,18 @@ Sensor_I2C_Probe_Intf LSM9DS1_AG_intf = {
 static Sensor_I2C_Init_Pair LSM9DS1_AG_reg_pairs[] = {
 	{
 		.reg = CTRL_REG1_G,
-		// 245 dps at full scale, ODR-G = 14.9 Hz
-		.value = (0x01 << CTRL_REG1_G_ODR_POS) | (0x00 << CTRL_REG1_G_FS_POS),
+		// 245 dps at full scale, ODR-G = 952 Hz
+		.value = (0x06 << CTRL_REG1_G_ODR_POS) | (0x00 << CTRL_REG1_G_FS_POS),
 	},
 	{
 		.reg = CTRL_REG3_G,
-		// Enable LP mode. HPF is OFF
-		.value = CTRL_REG3_G_LP,
+		// HPF is OFF
+		.value = 0x00,
 	},
 	{
 		.reg = CTRL_REG6_XL,
-		// +-2g at full scale, ODR-XL = 10 Hz
-		.value = 0x01 << CTRL_REG6_XL_ODR_POS,
+		// +-2g at full scale, ODR-XL = 952 Hz
+		.value = 0x06 << CTRL_REG6_XL_ODR_POS,
 	},
 	{
 		.reg = CTRL_REG8,
@@ -117,8 +117,50 @@ static Sensor_I2C_Init LSM9DS1_AG_init_array = {
 	.data_size = sizeof(uint8_t), // Byte data
 };
 
+static Sensor_I2C_Init_Pair LSM9DS1_AG_powerDown_pairs[] = {
+	{
+		.reg = CTRL_REG1_G,
+		// 245 dps at full scale, ODR-G = Powerdown
+		.value = (0x00 << CTRL_REG1_G_ODR_POS) | (0x00 << CTRL_REG1_G_FS_POS),
+	},
+	{
+		.reg = CTRL_REG6_XL,
+		// +-2g at full scale, ODR-XL = Powerdown
+		.value = 0x00 << CTRL_REG6_XL_ODR_POS,
+	},
+};
+
+static Sensor_I2C_Power LSM9DS1_AG_powerDown_array = {
+	.array = LSM9DS1_AG_powerDown_pairs,
+	.size = SIZE_OF_INIT_ARRAY(LSM9DS1_AG_powerDown_pairs),
+	.reg_size = sizeof(uint8_t), // Byte addr
+	.data_size = sizeof(uint8_t), // Byte data
+};
+
+static Sensor_I2C_Init_Pair LSM9DS1_AG_powerUp_pairs[] = {
+	{
+		.reg = CTRL_REG1_G,
+		// 245 dps at full scale, ODR-G = 952 Hz
+		.value = (0x06 << CTRL_REG1_G_ODR_POS) | (0x00 << CTRL_REG1_G_FS_POS),
+	},
+	{
+		.reg = CTRL_REG6_XL,
+		// +-2g at full scale, ODR-XL = 952 Hz
+		.value = 0x06 << CTRL_REG6_XL_ODR_POS,
+	},
+};
+
+static Sensor_I2C_Power LSM9DS1_AG_powerUp_array = {
+	.array = LSM9DS1_AG_powerUp_pairs,
+	.size = SIZE_OF_INIT_ARRAY(LSM9DS1_AG_powerUp_pairs),
+	.reg_size = sizeof(uint8_t), // Byte addr
+	.data_size = sizeof(uint8_t), // Byte data
+};
+
 int LSM9DS1_AG_read_regs(Sensor *sensor, void* data) {
 	HAL_StatusTypeDef rc = HAL_OK;
+
+	sensor_delay(2);
 
 	LSM9DS1_AG_Out_Data * out_data = (LSM9DS1_AG_Out_Data*) data;
 
@@ -140,7 +182,9 @@ static Sensor_Func_Table LSM9DS1_AG_func_table = {
 	.probe = i2c_sensor_probe,
 	.read = LSM9DS1_AG_read_regs,
 	.init = i2c_sensor_init_regs,
-	.packData = LSM9DS1_AG_packData
+	.packData = LSM9DS1_AG_packData,
+	.powerDown = i2c_sensor_powerDown,
+	.powerUp = i2c_sensor_powerUp
 };
 
 
@@ -152,6 +196,9 @@ int LSM9DS1_AG_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {
 		sensor->out_data = malloc(sizeof(LSM9DS1_AG_Out_Data));
 		if (sensor->out_data == NULL) rc = 1;
 	}
+
+	sensor->data.i2c.powerup = &LSM9DS1_AG_powerUp_array;
+	sensor->data.i2c.powerdown = &LSM9DS1_AG_powerDown_array;
 
 	return rc;
 }

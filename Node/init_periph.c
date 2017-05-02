@@ -31,7 +31,7 @@ int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma) {
 	hi2c->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
 	hi2c->Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
-	uint32_t rc = HAL_I2C_Init(hi2c);
+	HAL_StatusTypeDef rc = HAL_I2C_Init(hi2c);
 
 	// Enable I2C interrupts
 	HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0x00, 0x00);
@@ -76,11 +76,16 @@ int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma) {
 	hi2c->hdmatx = hdma;
 	hdma->Parent = hi2c;
 
-	// Turn off the display on the sense hat
-	uint8_t data = 0x00;
-	if ((rc |= HAL_I2C_Mem_Write_DMA(hi2c, 0x46<<1, 0x00, 1, &data, 192)) == HAL_OK) {
-		while(done == 0);
-	}
+#warning Remove LCD Test
+//	uint8_t on = 1;
+//	while(1) {
+//		uint8_t data = on ? 0x47: 0x07;
+//
+//		rc = HAL_I2C_Mem_Write(hi2c, 0x46 << 1, 0xf4, 1, &data, 1, 1000);
+//		HAL_Delay(60000);
+//
+//		on = !on;
+//	}
 
 	return rc;
 }

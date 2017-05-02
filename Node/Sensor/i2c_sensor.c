@@ -54,10 +54,50 @@ int i2c_sensor_read_regs(Sensor *sensor, void *data) {
 	return rc;
 }
 
+int i2c_sensor_powerDown(Sensor *sensor) {
+	uint32_t num = sensor->data.i2c.powerdown->size;
+	uint32_t data_size = sensor->data.i2c.powerdown->data_size;
+	uint32_t reg_size = sensor->data.i2c.powerdown->reg_size;
+	Sensor_I2C_Init_Pair *pair = sensor->data.i2c.powerdown->array;
+
+	HAL_StatusTypeDef rc = HAL_OK;
+
+	for (int i = 0; i < num; i++) {
+		rc = HAL_I2C_Mem_Write(sensor->data.i2c.hi2c, sensor->data.i2c.dev_addr,
+						  	   pair[i].reg, reg_size, (uint8_t*)&pair[i].value,
+							   data_size, 1000);
+		if (rc != HAL_OK)
+			break;
+	}
+
+	return rc;
+}
+
+int i2c_sensor_powerUp(Sensor *sensor) {
+	uint32_t num = sensor->data.i2c.powerup->size;
+	uint32_t data_size = sensor->data.i2c.powerup->data_size;
+	uint32_t reg_size = sensor->data.i2c.powerup->reg_size;
+	Sensor_I2C_Init_Pair *pair = sensor->data.i2c.powerup->array;
+
+	HAL_StatusTypeDef rc = HAL_OK;
+
+	for (int i = 0; i < num; i++) {
+		rc = HAL_I2C_Mem_Write(sensor->data.i2c.hi2c, sensor->data.i2c.dev_addr,
+						  	   pair[i].reg, reg_size, (uint8_t*)&pair[i].value,
+							   data_size, 1000);
+		if (rc != HAL_OK)
+			break;
+	}
+
+	return rc;
+}
+
 static Sensor_Func_Table i2c_func_tbl = {
 	.probe = i2c_sensor_probe,
 	.init = i2c_sensor_init_regs,
 	.read = i2c_sensor_read_regs,
+	.powerDown = i2c_sensor_powerDown,
+	.powerUp = i2c_sensor_powerUp
 };
 
 int i2c_sensor_init(Sensor *sensor, char *name, Sensor_Func_Table *func_tbl,

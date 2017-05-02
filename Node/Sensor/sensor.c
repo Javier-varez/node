@@ -30,7 +30,14 @@ void sensor_addDiscoverableSensor(LListElement **head, I2C_HandleTypeDef *hi2c, 
 void sensor_readSensors(LListElement *head) {
 	while(head != NULL) {
 		Sensor *sensor = (Sensor*)head->content;
+		// Power up sensor
+		if (sensor->func_tbl->powerUp)
+			sensor->func_tbl->powerUp(sensor);
+		// Read Sensor Data
 		sensor->func_tbl->read(sensor, sensor->out_data);
+		// Power Down sensor
+		if (sensor->func_tbl->powerDown)
+			sensor->func_tbl->powerDown(sensor);
 		head = head->nextElement;
 	}
 }
