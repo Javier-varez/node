@@ -18,6 +18,7 @@
 
 extern DMA_HandleTypeDef hdma;
 extern I2C_HandleTypeDef hi2c;
+extern RTC_HandleTypeDef hrtc;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -54,4 +55,9 @@ void I2C1_EV_IRQHandler() {
 
 void I2C1_ER_IRQHandler() {
 	HAL_I2C_ER_IRQHandler(&hi2c);
+}
+
+/* Private RTC IRQ handlers */
+void RTC_WKUP_IRQHandler() {
+	HAL_RTCEx_WakeUpTimerIRQHandler(&hrtc);
 }

@@ -16,6 +16,7 @@
 I2C_HandleTypeDef hi2c;
 DMA_HandleTypeDef hdma;
 UART_HandleTypeDef huart;
+RTC_HandleTypeDef hrtc;
 
 #warning TODO: Remove select mode after testing
 
@@ -46,10 +47,15 @@ int Node_init(Node *node, uint32_t id) {
 
 		rc = uart_init(&huart);
 		rc |= i2c_init(&hi2c, &hdma);
+		rc |= rtc_init(&hrtc);
+
 		sensor_discoverDevicesOnI2CBus(&node->sensor_list, &hi2c);
 
 		select_mode();
 		rc |= comms_module_Init(&node->comms, mode);
+
+		// Wake microcontroller each 10 seconds
+		rtc_setup_wakeup_interrupt(&hrtc, 10);
 
 		return rc;
 	}
@@ -100,6 +106,17 @@ void receive(Node *node) {
 	}
 }
 
+void Node_WFI() {
+	// Disable SO interrupts
+	taskENTER_CRITICAL();
+	// Enter STOP mode
+	HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+	// Reconfigure Clk
+	InitClk();
+	// Enable SO Interrupts
+	taskEXIT_CRITICAL();
+}
+
 void Node_task(void *param) {
 	Node *node = (Node*) param;
 	LListElement *sensor_list = node->sensor_list;
@@ -108,11 +125,12 @@ void Node_task(void *param) {
 	if (mode == RECEIVER)
 		receive(node);
 
-	TickType_t lastWakeTime = xTaskGetTickCount();
+	//TickType_t lastWakeTime = xTaskGetTickCount();
 	while(1) {
 		sensor_readSensors(sensor_list);
 		sensor_sendSensorData(sensor_list, &node->comms.device, node->id);
 
-		vTaskDelayUntil(&lastWakeTime, 2000/portTICK_PERIOD_MS);
+
+		//vTaskDelayUntil(&lastWakeTime, 2000/portTICK_PERIOD_MS);
 	}
 }

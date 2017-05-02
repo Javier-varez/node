@@ -7,6 +7,7 @@
 
 
 #include "init_periph.h"
+#include "FreeRTOS.h"
 
 volatile int done = 0;
 
@@ -18,7 +19,36 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
 	done = 1;
 }
 
-#warning TODO: Change i2c interrupt priorities to support FreeRTOS
+
+void InitClk() {
+	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+
+	__HAL_RCC_PWR_CLK_ENABLE();
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+	RCC_OscInitStruct.PLL.PLLN = 192;
+	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+	RCC_OscInitStruct.PLL.PLLM = 4;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLQ = 8;
+	HAL_RCC_OscConfig(&RCC_OscInitStruct);
+
+	RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_HCLK |
+								   RCC_CLOCKTYPE_PCLK1 |
+								   RCC_CLOCKTYPE_PCLK2 |
+								   RCC_CLOCKTYPE_SYSCLK);
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2);
+}
+
 
 int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma) {
 
@@ -69,7 +99,7 @@ int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma) {
 
 	rc |= HAL_DMA_Init(hdma);
 
-	HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0x00, 0x00);
+	HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY, 0x00);
 	HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
 
 	// Link dma to i2c peripheral
@@ -184,6 +214,89 @@ int gpio_init() {
 	gpio.Pin = GPIO_PIN_3;
 	gpio.Speed = GPIO_SPEED_FAST;
 	HAL_GPIO_Init(GPIOA, &gpio);
+
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	gpio.Mode = GPIO_MODE_OUTPUT_PP;
+	gpio.Pull = GPIO_NOPULL;
+	gpio.Pin = GPIO_PIN_15;
+	gpio.Speed = GPIO_SPEED_FAST;
+	HAL_GPIO_Init(GPIOD, &gpio);
+
+	return 0;
+}
+
+int rtc_init(RTC_HandleTypeDef *rtc) {
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	HAL_PWR_EnableBkUpAccess();
+
+	rtc->Instance = RTC;
+	rtc->Init.HourFormat = RTC_HOURFORMAT_24;
+	rtc->Init.AsynchPrediv = 128;
+	rtc->Init.SynchPrediv = 256; // 128*256 = 32768 => 32768 Hz / (128*256) = 1Hz
+	rtc->Init.HourFormat = RTC_HOURFORMAT_24;
+	rtc->Init.OutPut = RTC_OUTPUT_DISABLE;
+	rtc->Init.OutPutType = RTC_OUTPUT_TYPE_PUSHPULL;
+	rtc->Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+
+	// Configure LSI Clk
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
+
+	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
+	RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+
+	PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+
+	HAL_RCC_OscConfig(&RCC_OscInitStruct);
+	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+
+	__HAL_RCC_RTC_ENABLE();
+
+	//Set time and date
+	RTC_DateTypeDef RTC_DateStruct;
+	RTC_TimeTypeDef RTC_TimeStruct;
+
+	RTC_DateStruct.Year = 0;
+	RTC_DateStruct.Month = 1;
+	RTC_DateStruct.Date = 1;
+	RTC_DateStruct.WeekDay = RTC_WEEKDAY_TUESDAY;
+	HAL_RTC_SetDate(rtc, &RTC_DateStruct, RTC_FORMAT_BIN);
+
+	RTC_TimeStruct.Hours = 0x00;
+	RTC_TimeStruct.Minutes = 0x00;
+	RTC_TimeStruct.Seconds = 0x00;
+	RTC_TimeStruct.TimeFormat = RTC_HOURFORMAT_24;
+	RTC_TimeStruct.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	RTC_TimeStruct.StoreOperation = RTC_STOREOPERATION_RESET;
+	HAL_RTC_SetTime(rtc, &RTC_TimeStruct, RTC_FORMAT_BCD);
+
+	HAL_RTC_Init(rtc);
+
+	return 0;
+}
+
+int rtc_setup_wakeup_interrupt(RTC_HandleTypeDef *rtc, uint32_t period_s) {
+	/* Disable wakeup interrupt */
+	__HAL_RTC_WAKEUPTIMER_DISABLE(rtc);
+
+	/* Disable RTC interrupt flag */
+	__HAL_RTC_WAKEUPTIMER_DISABLE_IT(rtc, RTC_IT_WUT);
+
+	/* Clear pending bit */
+	__HAL_RTC_WAKEUPTIMER_EXTI_CLEAR_FLAG();
+
+	/* Clear flag */
+	__HAL_RTC_WAKEUPTIMER_CLEAR_FLAG(rtc, RTC_FLAG_WUTF);
+
+	uint32_t val = period_s * (32768 / 16);
+	HAL_RTCEx_SetWakeUpTimer_IT(rtc, val, RTC_WAKEUPCLOCK_RTCCLK_DIV16);
+
+	HAL_NVIC_SetPriority(RTC_WKUP_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(RTC_WKUP_IRQn);
 
 	return 0;
 }
