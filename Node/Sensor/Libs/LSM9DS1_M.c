@@ -162,8 +162,21 @@ int LSM9DS1_M_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
-void LSM9DS1_M_packData(Sensor *sensor, uint8_t *data) {
-	memcpy(data, sensor->out_data, sizeof(LSM9DS1_M_Out_Data));
+int LSM9DS1_M_packData(Sensor *sensor, uint8_t *data, uint8_t data_len) {
+	LSM9DS1_M_Out_Data *out_data = (LSM9DS1_M_Out_Data*)sensor->out_data;
+
+	if (sizeof(LSM9DS1_M_Out_Data) + 2 <= data_len ) {
+		data[0] = 'M';
+		data++;
+
+		memcpy(data, out_data->magnetometer, sizeof(int16_t) * 3);
+		data += sizeof(int16_t) * 3;
+
+		data[0] = '\0';
+
+		return 1;
+	}
+	return 0;
 }
 
 static Sensor_Func_Table LSM9DS1_M_func_table = {

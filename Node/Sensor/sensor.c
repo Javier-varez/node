@@ -41,24 +41,3 @@ void sensor_readSensors(LListElement *head) {
 		head = head->nextElement;
 	}
 }
-
-void sensor_sendSensorData(LListElement *head, nRF24L01 *device, uint8_t node_id) {
-
-	uint8_t data[32];
-	data[0] = node_id;
-
-	uint8_t index = 0;
-	while (head != NULL) {
-		Sensor *sensor = (Sensor*)head->content;
-
-		data[1] = index;
-		sensor->func_tbl->packData(sensor, &data[2]);
-
-		nRF24L01_transmit(device, (uint8_t*)data);
-
-		vTaskDelay(20/portTICK_PERIOD_MS);
-
-		head = head->nextElement;
-		index++;
-	}
-}

@@ -8,8 +8,6 @@
 #include "sensor.h"
 #include <string.h>
 
-#warning TODO: Replace blocking function calls by interrupt equivalents (or DMA)
-
 int i2c_sensor_probe(Sensor *sensor) {
 	HAL_StatusTypeDef rc = HAL_OK;
 

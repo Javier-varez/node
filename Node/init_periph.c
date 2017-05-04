@@ -215,12 +215,8 @@ int gpio_init() {
 	gpio.Speed = GPIO_SPEED_FAST;
 	HAL_GPIO_Init(GPIOA, &gpio);
 
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-	gpio.Mode = GPIO_MODE_OUTPUT_PP;
-	gpio.Pull = GPIO_NOPULL;
-	gpio.Pin = GPIO_PIN_15;
-	gpio.Speed = GPIO_SPEED_FAST;
-	HAL_GPIO_Init(GPIOD, &gpio);
+	HAL_NVIC_SetPriority(EXTI3_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY, 0x00);
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
 	return 0;
 }

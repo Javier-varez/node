@@ -174,8 +174,27 @@ int LSM9DS1_AG_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
-void LSM9DS1_AG_packData(Sensor *sensor, uint8_t *data) {
-	memcpy(data, sensor->out_data, sizeof(LSM9DS1_AG_Out_Data));
+int LSM9DS1_AG_packData(Sensor *sensor, uint8_t *data, uint8_t data_len) {
+	LSM9DS1_AG_Out_Data *out_data = (LSM9DS1_AG_Out_Data*)sensor->out_data;
+
+	if (sizeof(LSM9DS1_AG_Out_Data) + 3 <= data_len ) {
+		data[0] = 'A';
+		data++;
+
+		memcpy(data, out_data->accelerometer, sizeof(int16_t) * 3);
+		data += sizeof(int16_t) * 3;
+
+		data[0] = 'G';
+		data++;
+
+		memcpy(data, out_data->gyroscope, sizeof(int16_t) * 3);
+		data += sizeof(int16_t) * 3;
+
+		data[0] = '\0';
+
+		return 1;
+	}
+	return 0;
 }
 
 static Sensor_Func_Table LSM9DS1_AG_func_table = {

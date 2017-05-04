@@ -163,8 +163,27 @@ int HTS221_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
-void HTS221_packData(Sensor *sensor, uint8_t *data) {
-	memcpy(data, sensor->out_data, sizeof(HTS221_Out_Data));
+int HTS221_packData(Sensor *sensor, uint8_t *data, uint8_t data_len) {
+	HTS221_Out_Data *out_data = (HTS221_Out_Data*)sensor->out_data;
+
+	if (sizeof(HTS221_Out_Data) + 3 <= data_len ) {
+		data[0] = 'H';
+		data++;
+
+		memcpy(data, &out_data->humidity, sizeof(out_data->humidity));
+		data += sizeof(out_data->humidity);
+
+		data[0] = 'T';
+		data++;
+
+		memcpy(data, &out_data->temperature, sizeof(out_data->temperature));
+		data += sizeof(out_data->temperature);
+
+		data[0] = '\0';
+
+		return 1;
+	}
+	return 0;
 }
 
 static Sensor_Func_Table HTS221_func_table = {

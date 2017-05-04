@@ -9,7 +9,9 @@
 #define COMMS_MODULE_LIBS_NRF24L01_H_
 
 #include "stm32f4xx.h"
-
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 // Commands
 
@@ -60,12 +62,18 @@
 #define 	CONFIG_PWR_UP		0x02
 #define 	CONFIG_EN_CRC		0x08
 
+#define		MASK_RX_DR			0x40
+#define		MASK_TX_DS			0x20
+#define		MASK_MAX_RT			0x10
+
 #define 	RF_SETUP_RF_DR		0x08
 #define 	RF_SETUP_LNA_HCURR	0x01
 
 #define 	STATUS_RX_DR		0x40
 #define 	STATUS_TX_DS		0x20
 #define 	STATUS_MAX_RT		0x10
+
+#define		RX_EMPTY			0x01
 
 #define 	ADDR_LENGTH			5
 
@@ -99,6 +107,7 @@ typedef struct {
 	GPIO_PIN_TypeDef IRQ;
 	GPIO_PIN_TypeDef CSN;
 	SPI_HandleTypeDef *hspi;
+	xSemaphoreHandle IRQ_Semaphore;
 } nRF24L01;
 
 int nRF24L01_init(nRF24L01 *module);
@@ -109,12 +118,17 @@ int nRF24L01_powerUp(nRF24L01* module);
 int nRF24L01_transmit(nRF24L01 *module, uint8_t *payload);
 
 int nRF24L01_pollForRXPacket(nRF24L01 *module);
+int nRF24L01_pollForRXPacketWithTimeout(nRF24L01 *module, uint32_t timeout_ms);
 int nRF24L01_pollForTXPacket(nRF24L01 *module);
+int nRF24L01_pollForTXPacketWithTimeout(nRF24L01 *module, uint32_t timeout_ms);
 
 int nRF24L01_writePayload(nRF24L01 *module, uint8_t *buf, uint8_t len);
 int nRF24L01_readPayload(nRF24L01 *module, uint8_t *buf, uint8_t len);
 int nRF24L01_readRegister(nRF24L01 *module, uint8_t reg, uint8_t *buf, uint8_t len);
 int nRF24L01_writeRegister(nRF24L01 *module, uint8_t reg, uint8_t *buf, uint8_t len);
+
+void nRF24L01_clearIRQ(nRF24L01 *module, uint8_t irq);
+void nRF24L01_IRQ_Received();
 
 ///////////// Abstraction layer //////////////////
 int nRF24L01_sendCommand(nRF24L01 *module, uint8_t command);

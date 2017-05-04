@@ -17,10 +17,13 @@ typedef struct {
 	uint8_t id;
 	LListElement *sensor_list; // Linked list
 	Comms_module comms;
+	uint8_t queued_packages;
 } Node;
 
 // Utility functions
 int Node_init(Node *node, uint32_t id);
 void Node_task(void *param);
+
+void Node_Receiver_test();
 
 #endif /* NODE_H_ */

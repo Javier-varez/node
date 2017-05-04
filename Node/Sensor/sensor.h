@@ -35,7 +35,7 @@ typedef struct sensor_fuct_tbl {
 	int (*probe)(Sensor *);
 	int (*init)(Sensor *);
 	int (*read)(Sensor *, void *);
-	void (*packData)(Sensor *, uint8_t *);
+	int (*packData)(Sensor *, uint8_t *, uint8_t);
 	int (*powerDown)(Sensor *);
 	int (*powerUp)(Sensor *);
 } Sensor_Func_Table;

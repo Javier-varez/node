@@ -145,8 +145,27 @@ int LPS25H_read_regs(Sensor *sensor, void* data) {
 	return rc;
 }
 
-void LPS25H_packData(Sensor *sensor, uint8_t *data) {
-	memcpy(data, sensor->out_data, sizeof(LPS25H_Out_Data));
+int LPS25H_packData(Sensor *sensor, uint8_t *data, uint8_t data_len) {
+	LPS25H_Out_Data *out_data = (LPS25H_Out_Data*)sensor->out_data;
+
+	if (sizeof(HTS221_Out_Data) + 3 <= data_len ) {
+		data[0] = 'P';
+		data++;
+
+		memcpy(data, &out_data->pressure, sizeof(out_data->pressure));
+		data += sizeof(out_data->pressure);
+
+		data[0] = 'T';
+		data++;
+
+		memcpy(data, &out_data->temperature, sizeof(out_data->temperature));
+		data += sizeof(out_data->temperature);
+
+		data[0] = '\0';
+
+		return 1;
+	}
+	return 0;
 }
 
 static Sensor_Func_Table LPS25H_func_table = {
