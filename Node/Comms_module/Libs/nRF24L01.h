@@ -127,6 +127,7 @@ int nRF24L01_readPayload(nRF24L01 *module, uint8_t *buf, uint8_t len);
 int nRF24L01_readRegister(nRF24L01 *module, uint8_t reg, uint8_t *buf, uint8_t len);
 int nRF24L01_writeRegister(nRF24L01 *module, uint8_t reg, uint8_t *buf, uint8_t len);
 
+void nRF24L01_applyIRQMask(nRF24L01 *module, uint8_t mask);
 void nRF24L01_clearIRQ(nRF24L01 *module, uint8_t irq);
 void nRF24L01_IRQ_Received();
 

@@ -8,7 +8,7 @@
 #include "Comms_module.h"
 #include "init_periph.h"
 
-#define		RX_TIMEOUT_MS	2
+#define		RX_TIMEOUT_MS	5
 #define		TX_TIMEOUT_MS	2
 
 SPI_HandleTypeDef hspi;

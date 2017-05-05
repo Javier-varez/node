@@ -27,7 +27,7 @@ int nRF24L01_init(nRF24L01 *module) {
 	// Wait POR just in case
 	vTaskDelay(20/portTICK_RATE_MS);
 
-	// Power up, set mode, enable CRC (1 bit)
+	// Power up, set mode, enable CRC (1 byte)
 	uint8_t reg = CONFIG_EN_CRC | module->configuration.mode;
 	nRF24L01_writeRegister(module, CONFIG, &reg, 1);
 
@@ -121,7 +121,6 @@ int nRF24L01_transmit(nRF24L01 *module, uint8_t *payload) {
 	return rc;
 }
 
-#warning TODO: Implement interrupt support for nRF24L01
 int nRF24L01_pollForRXPacket(nRF24L01 *module) {
 	uint8_t status = 0;
 	uint8_t rc = 0;
