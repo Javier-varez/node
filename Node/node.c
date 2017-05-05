@@ -108,7 +108,6 @@ void Node_sendSensorData(Node *node, LListElement *head) {
 }
 
 void Node_handleACKPayload(Node *node) {
-#warning do things with ACK payload!
 	Comms_Payload ACK_Payload;
 
 	// Don't wait forever here
@@ -133,8 +132,6 @@ void Node_task(void *param) {
 	Node *node = (Node*) param;
 	LListElement *sensor_list = node->sensor_list;
 
-	//Node_Receiver_test();
-
 	// Init Comms module
 	comms_module_Init(&node->comms, TRANSMITTER);
 
@@ -144,94 +141,6 @@ void Node_task(void *param) {
 		Node_handleACKPayload(node);
 
 		Node_WFI(node);
-	}
-}
-
-
-char str[320];
-uint8_t alarm_on = 0;
-void Node_Receiver_test() {
-	uint8_t rc = 0;
-	Comms_module comms;
-	Comms_Payload Payload;
-
-	Comms_Payload ACK_Payload;
-
-	InitClk();
-
-	rc = uart_init(&huart);
-	rc |= comms_module_Init(&comms, RECEIVER);
-
-	while(1) {
-
-		// Receive data
-		nRF24L01_setMode(&comms.device, RECEIVER);
-		if (nRF24L01_pollForRXPacketWithTimeout(&comms.device, 100)) {
-			nRF24L01_readPayload(&comms.device, (uint8_t*)&Payload, sizeof(Payload));
-
-			ACK_Payload.PID = Payload.PID;
-			ACK_Payload.address = Payload.address;
-
-			ACK_Payload.data[0] = 'A';
-			ACK_Payload.data[1] = 'C';
-			ACK_Payload.data[2] = 'K';
-			ACK_Payload.data[3] = '\0';
-
-			if (Payload.data[0] == 'A') {
-				int16_t *z = (int16_t*)(&Payload.data[5]);
-				if (*z > 15000) {
-					alarm_on = 1;
-					ACK_Payload.data[0] = 'C';
-					ACK_Payload.data[1] = 'F';
-					ACK_Payload.data[2] = 'G';
-					ACK_Payload.data[3] = 'A';
-					ACK_Payload.data[4] = '1';
-					ACK_Payload.data[5] = '\0';
-				} else if (alarm_on) {
-					alarm_on = 0;
-					ACK_Payload.data[0] = 'C';
-					ACK_Payload.data[1] = 'F';
-					ACK_Payload.data[2] = 'G';
-					ACK_Payload.data[3] = 'A';
-					ACK_Payload.data[4] = '0';
-					ACK_Payload.data[5] = '\0';
-				}
-			}
-
-			nRF24L01_setMode(&comms.device, TRANSMITTER);
-			nRF24L01_transmit(&comms.device, (uint8_t*)&ACK_Payload);
-			nRF24L01_pollForTXPacket(&comms.device);
-
-			// Print Package
-			uint8_t *data = Payload.data;
-			while(data[0] != '\0') {
-				if (data[0] == 'M') {
-					sprintf(str, "Received Magnetometer\r\n");
-					data += 7;
-				} else if (data[0] == 'A') {
-					sprintf(str, "Received Acc\r\n");
-					data += 7;
-				} else if (data[0] == 'G') {
-					sprintf(str, "Received Gyro\r\n");
-					data += 7;
-				} else if (data[0] == 'P') {
-					sprintf(str, "Pres:\t%f\r\n", *((float*)&data[1]));
-					data += 5;
-				} else if (data[0] == 'H') {
-					sprintf(str, "Humi:\t%f\r\n", *((float*)&data[1]));
-					data += 5;
-				} else if (data[0] == 'T') {
-					sprintf(str, "Temp:\t%f\r\n", *((float*)&data[1]));
-					data += 5;
-				} else {
-					break;
-				}
-
-				HAL_UART_Transmit(&huart, (uint8_t*)str, strlen(str), 1000);
-			}
-
-		}
-
 	}
 }
 

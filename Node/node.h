@@ -24,6 +24,4 @@ typedef struct {
 int Node_init(Node *node, uint32_t id);
 void Node_task(void *param);
 
-void Node_Receiver_test();
-
 #endif /* NODE_H_ */
