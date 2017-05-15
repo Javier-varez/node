@@ -18,7 +18,7 @@ DMA_HandleTypeDef hdma;
 UART_HandleTypeDef huart;
 RTC_HandleTypeDef hrtc;
 
-#define MIN_WAKEUP_PERIOD_S		2
+#define MIN_WAKEUP_PERIOD_S		1
 #define PAYLOAD_QUEUE_MAX_LEN	10
 #define ACK_QUEUE_MAX_LEN		5
 
@@ -36,6 +36,7 @@ int Node_init(Node *node, uint32_t id) {
 		node->id = id;
 		node->queued_packages = 0;
 		node->comms.sent_packages = 0;
+		node->current_sample = 0;
 
 		// Init peripherals
 		rc |= i2c_init(&hi2c, &hdma);
@@ -44,8 +45,15 @@ int Node_init(Node *node, uint32_t id) {
 		// Discover Sensors
 		sensor_discoverDevicesOnI2CBus(&node->sensor_list, &hi2c);
 
-		// Wake microcontroller each 10 seconds
+		// Wake microcontroller
 		rtc_setup_wakeup_interrupt(&hrtc, MIN_WAKEUP_PERIOD_S);
+
+		// Restore configuration
+		if (Node_loadConfiguration(node)) {
+			// If it fails, then apply std configuration
+			node->configuration.node_id = 0x00; // Standard node id informs that it lacks configuration
+		}
+		node->id = node->configuration.node_id = 0x00;
 
 		// Create Queues
 		node->comms.payloadQueue = xQueueCreate(PAYLOAD_QUEUE_MAX_LEN, sizeof(Comms_Payload));
@@ -96,11 +104,13 @@ void Node_sendSensorData(Node *node, LListElement *head) {
 	while (head != NULL) {
 		Sensor *sensor = (Sensor*)head->content;
 
-		// Insert data into package
-		if (sensor->func_tbl->packData(sensor, &payload.data[0], 30)) {
-			// Add data to transmission queue, wait until ready to receive
-			if (xQueueSendToBack(node->comms.payloadQueue, (void *)&payload, portMAX_DELAY) == pdPASS)
-				node->queued_packages++;
+		if (!(node->current_sample % sensor->sampling_period_s)) {
+			// Insert data into package
+			if (sensor->func_tbl->packData(sensor, &payload.data[0], 30)) {
+				// Add data to transmission queue, wait until ready to receive
+				if (xQueueSendToBack(node->comms.payloadQueue, (void *)&payload, portMAX_DELAY) == pdPASS)
+					node->queued_packages++;
+			}
 		}
 
 		head = head->nextElement;
@@ -133,14 +143,15 @@ void Node_task(void *param) {
 	LListElement *sensor_list = node->sensor_list;
 
 	// Init Comms module
-	comms_module_Init(&node->comms, TRANSMITTER);
+	comms_module_Init(&node->comms, TRANSMITTER, node->id);
 
 	while(1) {
-		sensor_readSensors(sensor_list);
+		sensor_readSensors(sensor_list, node->current_sample);
 		Node_sendSensorData(node, sensor_list);
 		Node_handleACKPayload(node);
 
 		Node_WFI(node);
+		node->current_sample++; // Increment current sample
 	}
 }
 

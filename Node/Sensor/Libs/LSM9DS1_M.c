@@ -19,6 +19,7 @@ Sensor_I2C_Probe_Intf LSM9DS1_M_intf = {
 #define		LSM9DS1_M_DEV_ADDR			0x1C
 #define		LSM9DS1_M_ID_VALUE			0x3D
 
+#define		DEFAULT_PERIOD_S			30
 /* Register Addresses */
 
 #define 	OFFSET_X_REG_L			0x05
@@ -191,7 +192,7 @@ static Sensor_Func_Table LSM9DS1_M_func_table = {
 
 int LSM9DS1_M_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {
 	uint8_t rc = i2c_sensor_init(sensor, "LSM9DS1_M", &LSM9DS1_M_func_table, hi2c, LSM9DS1_M_DEV_ADDR << 1, &LSM9DS1_M_init_array,
-								 OUT_X_L, sizeof(uint8_t), 3*sizeof(int16_t), WHO_AM_I, LSM9DS1_M_ID_VALUE);
+								 OUT_X_L, sizeof(uint8_t), 3*sizeof(int16_t), WHO_AM_I, LSM9DS1_M_ID_VALUE, DEFAULT_PERIOD_S);
 
 	if (rc == HAL_OK) {
 		sensor->out_data = malloc(sizeof(LSM9DS1_M_Out_Data));

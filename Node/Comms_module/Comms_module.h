@@ -31,7 +31,7 @@ typedef struct {
 
 typedef nRF24L01_Mode Comms_module_Mode;
 
-int comms_module_Init(Comms_module *module, Comms_module_Mode mode);
+int comms_module_Init(Comms_module *module, Comms_module_Mode mode, uint8_t id);
 void comms_task(void *param);
 
 

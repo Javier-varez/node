@@ -8,8 +8,14 @@
 #include "Comms_module.h"
 #include "init_periph.h"
 
+#define 	COMMS_CHANNEL	24
 #define		RX_TIMEOUT_MS	5
 #define		TX_TIMEOUT_MS	2
+#define 	TX_ADDR_0		0xE7
+#define 	TX_ADDR_1		0xE7
+#define 	TX_ADDR_2		0xE7
+#define 	TX_ADDR_3		0xE7
+#define 	TX_ADDR_4		0xE7
 
 SPI_HandleTypeDef hspi;
 
@@ -20,20 +26,20 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-int comms_module_Init(Comms_module *module, Comms_module_Mode mode) {
+int comms_module_Init(Comms_module *module, Comms_module_Mode mode, uint8_t id) {
 	spi_init(&hspi);
 	gpio_init();
 
 	// Module Address (Not related to nRF24L01)
-	module->address = 0x43;
+	module->address = id;
 	module->PID = 0x00;
 
-	module->device.configuration.addr[0] = 0xE7;
-	module->device.configuration.addr[1] = 0xE7;
-	module->device.configuration.addr[2] = 0xE7;
-	module->device.configuration.addr[3] = 0xE7;
-	module->device.configuration.addr[4] = 0xE7;
-	module->device.configuration.channel = 24; // Test channel
+	module->device.configuration.addr[0] = TX_ADDR_0;
+	module->device.configuration.addr[1] = TX_ADDR_1;
+	module->device.configuration.addr[2] = TX_ADDR_2;
+	module->device.configuration.addr[3] = TX_ADDR_3;
+	module->device.configuration.addr[4] = TX_ADDR_4;
+	module->device.configuration.channel = COMMS_CHANNEL; // Test channel
 	module->device.configuration.output_power = m0dBm;
 	module->device.hspi = &hspi;
 	module->device.CE.pin = GPIO_PIN_5;

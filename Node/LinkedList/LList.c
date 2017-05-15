@@ -2,8 +2,6 @@
 #include "LList.h"
 #include <stdlib.h>
 
-#warning unsafe use of malloc
-
 LListElement *LList_CreateList(void *content) {
   LListElement * head = malloc(sizeof(LListElement));
   if (head) {

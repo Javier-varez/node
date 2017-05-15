@@ -18,6 +18,8 @@ Sensor_I2C_Probe_Intf HTS221_intf = {
 
 #define		HTS221_DEV_ADDR			0x5F
 #define 	HTS221_DEV_ID			0xBC
+
+#define		DEFAULT_PERIOD_S		5
 /* Register Addresses */
 
 #define 	WHO_AM_I				0x0F
@@ -166,18 +168,18 @@ int HTS221_read_regs(Sensor *sensor, void* data) {
 int HTS221_packData(Sensor *sensor, uint8_t *data, uint8_t data_len) {
 	HTS221_Out_Data *out_data = (HTS221_Out_Data*)sensor->out_data;
 
-	if (sizeof(HTS221_Out_Data) + 3 <= data_len ) {
+	if (sizeof(out_data->humidity) + 2 <= data_len ) {
 		data[0] = 'H';
 		data++;
 
 		memcpy(data, &out_data->humidity, sizeof(out_data->humidity));
 		data += sizeof(out_data->humidity);
 
-		data[0] = 'T';
-		data++;
+		//data[0] = 'T';
+		//data++;
 
-		memcpy(data, &out_data->temperature, sizeof(out_data->temperature));
-		data += sizeof(out_data->temperature);
+		//memcpy(data, &out_data->temperature, sizeof(out_data->temperature));
+		//data += sizeof(out_data->temperature);
 
 		data[0] = '\0';
 
@@ -196,7 +198,7 @@ static Sensor_Func_Table HTS221_func_table = {
 int HTS221_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {
 	uint8_t rc = i2c_sensor_init(sensor, "HTS221", &HTS221_func_table, hi2c, HTS221_DEV_ADDR << 1, &HTS221_init_array,
 					HUMIDITY_OUT_L_ADDR | AUTO_INCREMENT_ADDR, sizeof(uint8_t), 2 * sizeof(int16_t),
-					WHO_AM_I, HTS221_DEV_ID);
+					WHO_AM_I, HTS221_DEV_ID, DEFAULT_PERIOD_S);
 
 	sensor->custom = malloc(sizeof(HTS221_Calibration_Data));
 	if (sensor->custom == NULL) rc = 1;
