@@ -98,7 +98,7 @@ static Sensor_Func_Table i2c_func_tbl = {
 	.powerUp = i2c_sensor_powerUp
 };
 
-int i2c_sensor_init(Sensor *sensor, char *name, Sensor_Func_Table *func_tbl,
+int i2c_sensor_init(Sensor *sensor, char *name, uint8_t sensorID, Sensor_Func_Table *func_tbl,
 					I2C_HandleTypeDef *hi2c, uint8_t dev_addr, Sensor_I2C_Init* init,
 					uint32_t read_addr, uint32_t read_addr_size, uint32_t read_size,
 					uint8_t id_addr, uint8_t id, uint32_t sampling_period_s) {
@@ -110,6 +110,7 @@ int i2c_sensor_init(Sensor *sensor, char *name, Sensor_Func_Table *func_tbl,
 		if (func_tbl != NULL) sensor->func_tbl = func_tbl;
 		else sensor->func_tbl = &i2c_func_tbl;
 
+		sensor->sensorID = sensorID;
 		sensor->data.i2c.hi2c = hi2c;
 		sensor->data.i2c.dev_addr = dev_addr;
 		sensor->data.i2c.init = init;

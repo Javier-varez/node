@@ -48,6 +48,7 @@ typedef union {
 
 struct sensor_struct {
 	char name[NAME_MAXLEN];
+	uint8_t sensorID;
 	Sensor_Interface interface;
 	Sensor_Func_Table *func_tbl;
 	Sensor_Data data;
