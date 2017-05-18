@@ -16,7 +16,6 @@ Sensor_I2C_Probe_Intf *discoverable_devices[]= {
 	NULL
 };
 
-
 void sensor_discoverDevicesOnI2CBus(LListElement **head, I2C_HandleTypeDef *hi2c) {
 	Sensor probe_sensor;
 	uint8_t i = 0;

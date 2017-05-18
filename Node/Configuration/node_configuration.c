@@ -53,7 +53,7 @@ int Node_loadConfiguration(Node* node) {
 
 	  node->configuration.node_id = data;
 
-	  for (uint8_t i = 0; i < (C_MAX_DATA_LEN-1)/2; i++) {
+	  for (uint8_t i = 0; i < (C_MAX_DATA_LEN - C_NODE_ID - 1)/2; i++) {
 		  uint16_t id, period;
 
 		  if(EE_ReadVariable(VirtAddVarTab[C_S0_ID + i], &id) != HAL_OK)
@@ -82,12 +82,12 @@ int Node_storeConfiguration(Node* node, uint8_t addr) {
 	}
 	else if (addr & 0x01) {
 		// Sensor ID
-		uint16_t data = node->configuration.sensor_config[(addr-1)/2].Sensor_ID;
+		uint16_t data = node->configuration.sensor_config[(addr-C_NODE_ID-1)/2].Sensor_ID;
 		if (EE_WriteVariable(VirtAddVarTab[addr], data) != HAL_OK)
 			goto exit_on_fail;
 	} else {
 		// Sensor period
-		uint16_t data = node->configuration.sensor_config[(addr-1)/2].Sensor_period;
+		uint16_t data = node->configuration.sensor_config[(addr-C_NODE_ID-1)/2].Sensor_period;
 		if (EE_WriteVariable(VirtAddVarTab[addr], data) != HAL_OK)
 			goto exit_on_fail;
 	}

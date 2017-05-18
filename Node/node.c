@@ -45,15 +45,27 @@ int Node_init(Node *node, uint32_t id) {
 		// Discover Sensors
 		sensor_discoverDevicesOnI2CBus(&node->sensor_list, &hi2c);
 
+#warning test load for MP45DT02 Microphone
+		Sensor *sensor = (Sensor*)malloc(sizeof(Sensor));
+		if (sensor != NULL) {
+			MP45DT02_init(sensor);
+			sensor->func_tbl->init(sensor);
+			if (node->sensor_list == NULL) {
+				node->sensor_list = LList_CreateList((void *)sensor);
+			} else {
+				LList_AppendElement(node->sensor_list, (void*) sensor);
+			}
+		}
+
 		// Wake microcontroller
 		rtc_setup_wakeup_interrupt(&hrtc, MIN_WAKEUP_PERIOD_S);
 
 		// Restore configuration
-		if (Node_loadConfiguration(node)) {
+		//if (Node_loadConfiguration(node)) {
 			// If it fails, then apply std configuration
-			node->configuration.node_id = 0x00; // Standard node id informs that it lacks configuration
-		}
-		node->id = node->configuration.node_id = 0x00;
+		//	node->configuration.node_id = 0x00; // Standard node id informs that it lacks configuration
+		//}
+		//node->id = node->configuration.node_id;
 
 		// Create Queues
 		node->comms.payloadQueue = xQueueCreate(PAYLOAD_QUEUE_MAX_LEN, sizeof(Comms_Payload));
@@ -133,6 +145,7 @@ void Node_handleACKPayload(Node *node) {
 				} else if (ACK_Payload.data[4] == '0') {
 					data = 0x05;
 				}
+
 				HAL_I2C_Mem_Write(&hi2c, 0x46 << 1, 0xf4, 1, &data, 1, 1000);
 		}
 	}

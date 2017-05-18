@@ -81,6 +81,8 @@
 									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
 									<listOptionValue builtIn="false" value="USE_RTOS_SYSTICK"/>
 									<listOptionValue builtIn="false" value="STM32F411xE"/>
+									<listOptionValue builtIn="false" value="ARM_MATH_CM4"/>
+									<listOptionValue builtIn="false" value="__FPU_PRESENT"/>
 								</option>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c.827321054" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.c"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s.191985304" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.input.s"/>
@@ -92,9 +94,11 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.1945361976" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker">
 								<option id="gnu.c.link.option.paths.1667133848" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/HAL&quot;"/>
 								</option>
 								<option id="gnu.c.link.option.libs.1269774343" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="stm32f411e-disco_hal_lib"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="PDMFilter_CM4F_GCC"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1823655682" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -264,9 +268,11 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.866941917" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker">
 								<option id="gnu.c.link.option.paths.1164342299" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/stm32f411e-disco_hal_lib/Release}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/Node/HAL&quot;"/>
 								</option>
 								<option id="gnu.c.link.option.libs.174537830" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="stm32f411e-disco_hal_lib"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="PDMFilter_CM4F_GCC"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.411072160" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

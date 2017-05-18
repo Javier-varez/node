@@ -46,7 +46,7 @@ typedef struct {
 
 typedef struct {
 	uint16_t node_id;
-	Sensor_Configuration sensor_config[(C_MAX_DATA_LEN-1)/2];
+	Sensor_Configuration sensor_config[(C_MAX_DATA_LEN-C_NODE_ID-1)/2];
 } Node_Configuration;
 
 

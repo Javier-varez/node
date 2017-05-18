@@ -19,6 +19,8 @@
 extern DMA_HandleTypeDef hdma;
 extern I2C_HandleTypeDef hi2c;
 extern RTC_HandleTypeDef hrtc;
+extern I2S_HandleTypeDef hAudioOutI2s;
+extern I2S_HandleTypeDef hAudioInI2s;
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -64,4 +66,14 @@ void RTC_WKUP_IRQHandler() {
 
 void EXTI3_IRQHandler() {
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+}
+
+void DMA1_Stream7_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(hAudioOutI2s.hdmatx);
+}
+
+void DMA1_Stream3_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(hAudioInI2s.hdmarx);
 }
