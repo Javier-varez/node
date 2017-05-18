@@ -21,7 +21,6 @@ Sensor_I2C_Probe_Intf LPS25H_intf = {
 #define		AUTO_INCREMENT_ADDR		0x80
 
 #define		DEFAULT_PERIOD_S		10
-#define		LPS25H_ID				0x02
 /* Register Addresses */
 
 #define 	REF_P_XL				0x08
@@ -177,10 +176,10 @@ static Sensor_Func_Table LPS25H_func_table = {
 	.packData = LPS25H_packData
 };
 
-int LPS25H_init(Sensor *sensor, I2C_HandleTypeDef *hi2c) {
+int LPS25H_init(Sensor *sensor, I2C_HandleTypeDef *hi2c, uint16_t sampling_period_s) {
 	uint8_t rc = i2c_sensor_init(sensor, "LPS25H", LPS25H_ID, &LPS25H_func_table, hi2c, LPS25H_DEV_ADDR << 1, &LPS25H_init_array,
 								 PRESS_OUT_XL | AUTO_INCREMENT_ADDR, sizeof(uint8_t), sizeof(LPS25H_Out_Data),
-								 WHO_AM_I, LPS25H_ID_VALUE, DEFAULT_PERIOD_S);
+								 WHO_AM_I, LPS25H_ID_VALUE, DEFAULT_PERIOD_S | sampling_period_s);
 	if (rc == 0) {
 		sensor->out_data = malloc(sizeof(LPS25H_Out_Data));
 		if (sensor->out_data == 0) rc = 1;

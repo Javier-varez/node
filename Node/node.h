@@ -28,5 +28,7 @@ int Node_init(Node *node, uint32_t id);
 void Node_task(void *param);
 int Node_loadConfiguration(Node* node);
 int Node_storeConfiguration(Node* node, uint8_t addr);
+void Node_Configuration_setPeriod(Node *node, uint8_t sensor_ID, uint16_t sampling_period);
+
 
 #endif /* NODE_H_ */

@@ -10,12 +10,14 @@
 
 #include "sensor.h"
 
+#define HTS221_ID				0x01
+
 typedef struct {
 	float humidity;		// Humedad relativa: %
 	float temperature;	// Temperatura: °C
 } HTS221_Out_Data;
 
-int HTS221_init(Sensor *sensor, I2C_HandleTypeDef *hi2c);
+int HTS221_init(Sensor *sensor, I2C_HandleTypeDef *hi2c, uint16_t sampling_period_s);
 int HTS221_remove(Sensor *sensor);
 
 Sensor_I2C_Probe_Intf HTS221_intf;

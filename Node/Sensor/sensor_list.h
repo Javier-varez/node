@@ -14,9 +14,16 @@
 #include "LSM9DS1_M.h"
 
 #include "LList.h"
+#define NUM_SENSORS 4
 
 extern Sensor_I2C_Probe_Intf *discoverable_devices[];
 
+typedef struct {
+	uint8_t sensor_ID;
+	Sensor_I2C_Probe_Intf *probe_intf;
+} struct_sensor_list;
+
+int sensorList_getIndex(uint8_t sensor_ID);
 void sensor_discoverDevicesOnI2CBus(LListElement **head, I2C_HandleTypeDef *hi2c);
 
 #endif /* SENSOR_LIST_H_ */

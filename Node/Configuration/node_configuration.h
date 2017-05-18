@@ -9,7 +9,7 @@
 #define CONFIGURATION_NODE_CONFIGURATION_H_
 
 #include "eeprom.h"
-
+#define SENSOR_NULL 0x00
 typedef enum {
 	C_NODE_ID = 0x10,
 	C_S0_ID,
@@ -46,8 +46,7 @@ typedef struct {
 
 typedef struct {
 	uint16_t node_id;
-	Sensor_Configuration sensor_config[(C_MAX_DATA_LEN-1)/2];
+	Sensor_Configuration sensor_config[(C_MAX_DATA_LEN-C_NODE_ID-1)/2];
 } Node_Configuration;
-
 
 #endif /* CONFIGURATION_NODE_CONFIGURATION_H_ */
