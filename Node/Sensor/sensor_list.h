@@ -23,7 +23,6 @@ typedef struct {
 	Sensor_I2C_Probe_Intf *probe_intf;
 } struct_sensor_list;
 
-int sensorList_getIndex(uint8_t sensor_ID);
+uint8_t sensorList_getIndex(uint8_t sensor_ID);
 void sensor_discoverDevicesOnI2CBus(LListElement **head, I2C_HandleTypeDef *hi2c);
-
 #endif /* SENSOR_LIST_H_ */

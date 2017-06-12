@@ -49,7 +49,7 @@ void sensor_discoverDevicesOnI2CBus(LListElement **head, I2C_HandleTypeDef *hi2c
 		if (discoverable_devices[i]->init(&probe_sensor, hi2c, 0) == 0) {
 			if (probe_sensor.func_tbl->probe(&probe_sensor) == 0) {
 				discoverable_devices[i]->remove(&probe_sensor);
-				//sensor_addDiscoverableSensor(head, hi2c, i);
+				sensor_addDiscoverableSensor(head, hi2c, i);
 			} else {
 				discoverable_devices[i]->remove(&probe_sensor);
 			}
@@ -58,7 +58,7 @@ void sensor_discoverDevicesOnI2CBus(LListElement **head, I2C_HandleTypeDef *hi2c
 	}
 }
 
-int sensorList_getIndex(uint8_t sensor_ID){
+uint8_t sensorList_getIndex(uint8_t sensor_ID){
 	int index = -1;
 	while(1){
 		if(available_sensors[++index].sensor_ID == sensor_ID){

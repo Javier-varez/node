@@ -12,11 +12,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-/*void sensor_addDiscoverableSensor(LListElement **head, I2C_HandleTypeDef *hi2c, uint8_t index) {
+void sensor_addDiscoverableSensor(LListElement **head, I2C_HandleTypeDef *hi2c, uint8_t index) {
 	Sensor *sensor = (Sensor*)malloc(sizeof(Sensor));
 	if (sensor == NULL) return;
 
-	if (discoverable_devices[index]->init(sensor, hi2c) == 0) {
+	if (discoverable_devices[index]->init(sensor, hi2c, 0) == 0) {
 		sensor->func_tbl->init(sensor);
 
 		if (*head == NULL) {
@@ -25,7 +25,7 @@
 			LList_AppendElement(*head, (void*) sensor);
 		}
 	}
-}*/
+}
 
 void sensor_addSensor(LListElement **head, I2C_HandleTypeDef *hi2c, Sensor_I2C_Probe_Intf *probe_intf, uint32_t sampling_period_s) {
 	Sensor *sensor = (Sensor*)malloc(sizeof(Sensor));
