@@ -38,7 +38,7 @@ void sensor_readSensors(LListElement *head, uint32_t id) {
 				sensor->func_tbl->powerUp(sensor);
 			// Read Sensor Data
 			sensor->func_tbl->read(sensor, sensor->out_data);
-			// Power Down sensor
+			// Padc_init();ower Down sensor
 			if (sensor->func_tbl->powerDown)
 				sensor->func_tbl->powerDown(sensor);
 		}

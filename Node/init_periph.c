@@ -118,7 +118,7 @@ int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma) {
 //	}
 
 	return rc;
-}
+})
 
 int spi_init(SPI_HandleTypeDef *hspi) {
 	uint8_t rc = 0;
@@ -297,3 +297,37 @@ int rtc_setup_wakeup_interrupt(RTC_HandleTypeDef *rtc, uint32_t period_s) {
 	return 0;
 }
 
+int adc_init(ADC_HandleTypeDef *hadc){
+
+	GPIO_InitTypeDef gpioInit;
+	__GPIOC_CLK_ENABLE();
+	__ADC1_CLK_ENABLE();
+
+	gpioInit.Pin = GPIO_PIN_1 | GPIO_PIN_2;
+	gpioInit.Mode = GPIO_MODE_ANALOG;
+	gpioInit.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOC, &gpioInit);
+
+	HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(ADC_IRQn);
+
+
+	hadc->Instance = ADC1;
+
+	hadc->Init.ClockPrescaler = ADC_CLOCKPRESCALER_PCLK_DIV2;
+	hadc->Init.Resolution = ADC_RESOLUTION_12B; //resolution: 12 bits (0 to 4095)
+	hadc->Init.ScanConvMode = DISABLE;
+	hadc->Init.ContinuousConvMode = ENABLE;
+	hadc->Init.DiscontinuousConvMode = DISABLE;
+	hadc->Init.NbrOfDiscConversion = 0;
+	hadc->Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+	hadc->Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T1_CC1;
+	hadc->Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	hadc->Init.NbrOfConversion = 1;
+	hadc->Init.DMAContinuousRequests = ENABLE;
+	hadc->Init.EOCSelection = DISABLE;
+
+	HAL_ADC_Init(hadc);
+
+	return 0;
+}
