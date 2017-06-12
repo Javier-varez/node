@@ -5,6 +5,7 @@
  *      Author: David Llamazares, Javier Andrés
  */
 
+
 #include "LDR.h"
 #include <stdlib.h>
 #include <string.h>
