@@ -16,9 +16,9 @@ int analog_func_read(Sensor *sensor, void *out_data){
 		//error
 	}
 	uint32_t ADCValue; //12 bits (0 to 4095)
+	HAL_ADC_Start(sensor_analog->hadc);
 	if (HAL_ADC_PollForConversion(sensor_analog->hadc, ANALOG_TIMEOUT) == HAL_OK)
 	{
-		HAL_ADC_Start(sensor_analog->hadc);
 		ADCValue = HAL_ADC_GetValue(sensor_analog->hadc);
 	}
 
@@ -69,6 +69,8 @@ int analog_sensor_init(Sensor *sensor, char *name, uint8_t sensorID,
 
 		sensor->data.analog.hadc = hadc;
 		sensor->data.analog.identifier = identifier;
+
+		sensor->out_data = (void*)malloc(sizeof(uint16_t));
 
 		return 0;
 	}

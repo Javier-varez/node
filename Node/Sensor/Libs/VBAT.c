@@ -22,7 +22,7 @@ void VBAT_init_sensor_structure(Sensor *sensor, ADC_HandleTypeDef *hadc) {
 	VBAT->channel.Rank = 1;
 	VBAT->channel.SamplingTime = ADC_SAMPLETIME_480CYCLES;
 	VBAT->channel.Offset = 0;
-	VBAT->channel.Channel = ADC_CHANNEL_12;
+	VBAT->channel.Channel = ADC_CHANNEL_11;
 }
 
 
