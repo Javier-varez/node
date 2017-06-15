@@ -17,6 +17,8 @@ I2C_HandleTypeDef hi2c;
 DMA_HandleTypeDef hdma;
 UART_HandleTypeDef huart;
 RTC_HandleTypeDef hrtc;
+ADC_HandleTypeDef hadc;
+
 
 #define MIN_WAKEUP_PERIOD_S		1
 #define PAYLOAD_QUEUE_MAX_LEN	10
@@ -41,9 +43,14 @@ int Node_init(Node *node, uint32_t id) {
 		// Init peripherals
 		rc |= i2c_init(&hi2c, &hdma);
 		rc |= rtc_init(&hrtc);
-
+		rc |= adc_init(&hadc);
 		// Discover Sensors
 		sensor_discoverDevicesOnI2CBus(&node->sensor_list, &hi2c);
+
+		// Force analog sensors
+		Sensor *sensor = sensor_createSensor();
+		void LDR_init_sensor_structure(sensor, hadc);
+		sensor_addSensor(&node->sensor_list, sensor);
 
 		// Wake microcontroller
 		rtc_setup_wakeup_interrupt(&hrtc, MIN_WAKEUP_PERIOD_S);

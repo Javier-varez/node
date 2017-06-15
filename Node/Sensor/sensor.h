@@ -58,7 +58,9 @@ struct sensor_struct {
 };
 
 void sensor_addDiscoverableSensor(LListElement **head, I2C_HandleTypeDef *hi2c, uint8_t index);
+void sensor_addSensor(LListElement **head, Sensor *sensor);
 void sensor_readSensors(LListElement *head, uint32_t id);
 void sensor_setSamplingPeriod(Sensor *sensor, uint32_t sampling_time_s);
+Sensor * sensor_createSensor();
 
 #endif /* SENSOR_H_ */

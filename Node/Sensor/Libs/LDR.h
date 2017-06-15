@@ -7,10 +7,8 @@ typedef struct {
 	float LDR; // Battery voltage in volts
 } LDR_Out_Data;
 
-int LDR_init(Sensor *sensor);
-int LDR_pack_data();
-int LDR_read();
-
 Sensor_Func_Table LDR_Function_Table;
+
+void LDR_init_sensor_structure(Sensor *sensor, ADC_HandleTypeDef *hadc);
 
 #endif /* LDR_H_ */

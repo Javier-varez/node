@@ -20,6 +20,6 @@ typedef struct sensor_struct Sensor;
 typedef struct sensor_fuct_tbl Sensor_Func_Table;
 
 int analog_sensor_init(Sensor *sensor, char *name, uint8_t sensorID,
-		Sensor_Func_Table *func_tbl, uint32_t sampling_period_s);
+		Sensor_Func_Table *func_tbl, uint32_t sampling_period_s, ADC_HandleTypeDef *hadc);
 
 #endif /* ANALOG_SENSOR_H_ */

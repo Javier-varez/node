@@ -51,7 +51,7 @@ typedef struct {
 	int (*remove)(Sensor *);
 } Sensor_I2C_Probe_Intf;
 
-int i2c_sensor_init(Sensor *sensor, char *name, Sensor_Func_Table *func_tbl,
+int i2c_sensor_init(Sensor *sensor, char *name, uint8_t sensorID, Sensor_Func_Table *func_tbl,
 					I2C_HandleTypeDef *hi2c, uint8_t dev_addr, Sensor_I2C_Init* init,
 					uint32_t read_addr, uint32_t read_addr_size, uint32_t read_size,
 					uint8_t id_addr, uint8_t id, uint32_t sampling_period_s);
