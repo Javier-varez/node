@@ -10,7 +10,8 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "LDR.h"
+#include "VBAT.h"
 #include <string.h>
 
 I2C_HandleTypeDef hi2c;
@@ -48,9 +49,13 @@ int Node_init(Node *node, uint32_t id) {
 		sensor_discoverDevicesOnI2CBus(&node->sensor_list, &hi2c);
 
 		// Force analog sensors
-		Sensor *sensor = sensor_createSensor();
-		void LDR_init_sensor_structure(sensor, hadc);
-		sensor_addSensor(&node->sensor_list, sensor);
+		Sensor *LDR_sensor = sensor_createSensor();
+		LDR_init_sensor_structure(LDR_sensor, &hadc);
+		sensor_addSensor(&node->sensor_list, LDR_sensor);
+
+		Sensor *VBAT_sensor = sensor_createSensor();
+		VBAT_init_sensor_structure(VBAT_sensor, &hadc);
+		sensor_addSensor(&node->sensor_list, VBAT_sensor);
 
 		// Wake microcontroller
 		rtc_setup_wakeup_interrupt(&hrtc, MIN_WAKEUP_PERIOD_S);

@@ -4,7 +4,7 @@
 #include "sensor.h"
 
 typedef struct {
-	float LDR; // Battery voltage in volts
+	uint16_t LDR; // Battery voltage in volts
 } LDR_Out_Data;
 
 Sensor_Func_Table LDR_Function_Table;

@@ -118,7 +118,7 @@ int i2c_init(I2C_HandleTypeDef *hi2c, DMA_HandleTypeDef *hdma) {
 //	}
 
 	return rc;
-})
+}
 
 int spi_init(SPI_HandleTypeDef *hspi) {
 	uint8_t rc = 0;
