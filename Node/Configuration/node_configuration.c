@@ -42,27 +42,29 @@ int Node_loadConfiguration(Node* node) {
 
 	  if( EE_Init() != EE_OK)
 	  {
-			goto exit_on_fail;
+		  goto exit_on_fail;
 	  }
 
 	  uint16_t data;
 
 	  // Read Node ID
-	  if((EE_ReadVariable(VirtAddVarTab[C_NODE_ID], &data)) != HAL_OK)
-			goto exit_on_fail;
+	  if((EE_ReadVariable(VirtAddVarTab[C_NODE_ID - C_NODE_ID], &data)) != HAL_OK)
+		  goto exit_on_fail;
 
 	  node->configuration.node_id = data;
 
 	  for (uint8_t i = 0; i < (C_MAX_DATA_LEN-C_NODE_ID-1)/2; i++) {
-		  uint16_t id, period;
+		  uint16_t id, period, valid = 1;
 
-		  if(EE_ReadVariable(VirtAddVarTab[C_S0_ID + i], &id) != HAL_OK)
-			  break;
-		  if(EE_ReadVariable(VirtAddVarTab[C_S0_P + i], &period) != HAL_OK)
-			  break;
+		  if(EE_ReadVariable(VirtAddVarTab[C_S0_ID + 2*i - C_NODE_ID], &id) != HAL_OK)
+			  valid = 0;
+		  if(EE_ReadVariable(VirtAddVarTab[C_S0_P + 2*i - C_NODE_ID], &period) != HAL_OK)
+			  valid = 0;
 
-		  node->configuration.sensor_config[i].Sensor_ID = data;
-		  node->configuration.node_id = period;
+		  if (valid) {
+			  node->configuration.sensor_config[i].Sensor_ID = data;
+			  node->configuration.sensor_config[i].Sensor_period = period;
+		  }
 	  }
 
 	  HAL_FLASH_Lock();
@@ -77,18 +79,18 @@ int Node_storeConfiguration(Node* node, uint8_t addr) {
     HAL_FLASH_Unlock();
 
 	if (addr == C_NODE_ID) {
-		if (EE_WriteVariable(VirtAddVarTab[addr], node->configuration.node_id) != HAL_OK)
+		if (EE_WriteVariable(VirtAddVarTab[addr - C_NODE_ID], node->configuration.node_id) != HAL_OK)
 			goto exit_on_fail;
 	}
 	else if (addr & 0x01) {
 		// Sensor ID
 		uint16_t data = node->configuration.sensor_config[(addr-C_NODE_ID-1)/2].Sensor_ID;
-		if (EE_WriteVariable(VirtAddVarTab[addr], data) != HAL_OK)
+		if (EE_WriteVariable(VirtAddVarTab[addr - C_NODE_ID], data) != HAL_OK)
 			goto exit_on_fail;
 	} else {
 		// Sensor period
 		uint16_t data = node->configuration.sensor_config[(addr-C_NODE_ID-1)/2].Sensor_period;
-		if (EE_WriteVariable(VirtAddVarTab[addr], data) != HAL_OK)
+		if (EE_WriteVariable(VirtAddVarTab[addr - C_NODE_ID], data) != HAL_OK)
 			goto exit_on_fail;
 	}
 

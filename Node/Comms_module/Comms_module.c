@@ -76,10 +76,13 @@ int comms_module_sendData(Comms_module *module, Comms_Payload *payload) {
 		// Wait ACK
 		nRF24L01_setMode(device, RECEIVER);
 		if (nRF24L01_pollForRXPacketWithTimeout(device, RX_TIMEOUT_MS)) {
-			nRF24L01_readPayload(device, (uint8_t*)&ACK_Payload, sizeof(ACK_Payload));
-			if ((ACK_Payload.address == module->address) &&
-				(ACK_Payload.PID == payload->PID)){
-				received_ack = 1;
+			while(nRF24L01_fifoNotEmpty(device)) {
+				nRF24L01_readPayload(device, (uint8_t*)&ACK_Payload, sizeof(ACK_Payload));
+				if ((ACK_Payload.address == module->address) &&
+					(ACK_Payload.PID == payload->PID)){
+					received_ack = 1;
+					break; //exit loop, we already found what we wanted
+				}
 			}
 		}
 
@@ -94,11 +97,6 @@ int comms_module_sendData(Comms_module *module, Comms_Payload *payload) {
 			   ACK_Payload.data[1] == 'F' &&
 			   ACK_Payload.data[2] == 'G') {
 		// Received CFG package
-		xQueueSendToBack(module->ACKQueue, (void *) &ACK_Payload, portMAX_DELAY);
-	} else if (ACK_Payload.data[0] == 'S' &&
-			   ACK_Payload.data[1] == 'T' &&
-			   ACK_Payload.data[2] == 'A') {
-		// Received STA
 		xQueueSendToBack(module->ACKQueue, (void *) &ACK_Payload, portMAX_DELAY);
 	}
 

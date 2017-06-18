@@ -117,6 +117,8 @@ int nRF24L01_powerUp(nRF24L01* module);
 
 int nRF24L01_transmit(nRF24L01 *module, uint8_t *payload);
 
+int nRF24L01_fifoNotEmpty(nRF24L01 *module);
+
 int nRF24L01_pollForRXPacket(nRF24L01 *module);
 int nRF24L01_pollForRXPacketWithTimeout(nRF24L01 *module, uint32_t timeout_ms);
 int nRF24L01_pollForTXPacket(nRF24L01 *module);

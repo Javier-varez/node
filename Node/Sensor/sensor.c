@@ -62,6 +62,10 @@ void sensor_readSensors(LListElement *head, uint32_t id) {
 	}
 }
 
-void sensor_setSamplingPeriod(Sensor *sensor, uint32_t sampling_period_s) {
-	sensor->sampling_period_s = sampling_period_s;
+void sensor_setSamplingPeriod(Sensor *sensor, uint16_t sampling_period_s) {
+	if(sampling_period_s >= 0x7FFF){
+		sensor->sampling_period_s = 0xFFFFFFFF; // 136 years in seconds... should be safe.
+	} else{
+		sensor->sampling_period_s = sampling_period_s;
+	}
 }

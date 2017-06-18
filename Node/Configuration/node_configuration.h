@@ -11,7 +11,7 @@
 #include "eeprom.h"
 #define SENSOR_NULL 0x00
 typedef enum {
-	C_NODE_ID = 0x10,
+	C_NODE_ID = 0x16,
 	C_S0_ID,
 	C_S0_P,
 	C_S1_ID,
@@ -38,6 +38,8 @@ typedef enum {
 	C_S11_P,
 	C_MAX_DATA_LEN
 } Config_addr;
+
+#define MAX_CONF_SENSORS ((C_MAX_DATA_LEN - C_NODE_ID - 1)/2)
 
 typedef struct {
 	uint16_t Sensor_ID;

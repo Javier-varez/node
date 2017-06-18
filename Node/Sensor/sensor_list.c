@@ -59,13 +59,11 @@ void sensor_discoverDevicesOnI2CBus(LListElement **head, I2C_HandleTypeDef *hi2c
 }
 
 uint8_t sensorList_getIndex(uint8_t sensor_ID){
-	int index = -1;
-	while(1){
-		if(available_sensors[++index].sensor_ID == sensor_ID){
+	int index = 0;
+	while(available_sensors[index].sensor_ID != 0x00){
+		if(available_sensors[index].sensor_ID == sensor_ID)
 			return index;
-		} else if(available_sensors[index].sensor_ID == 0x00){
-			return -1;
-		}
+		index++;
 	}
 	return -1;
 }

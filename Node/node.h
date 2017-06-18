@@ -19,6 +19,7 @@ typedef struct {
 	uint8_t id;
 	LListElement *sensor_list; // Linked list
 	Comms_module comms;
+	uint8_t alarm;
 	uint8_t queued_packages;
 	uint32_t current_sample;
 } Node;

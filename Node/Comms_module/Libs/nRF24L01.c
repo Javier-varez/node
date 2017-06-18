@@ -262,6 +262,16 @@ int nRF24L01_pollForRXPacketWithTimeout(nRF24L01 *module, uint32_t timeout_ms) {
 	return rc;
 }
 
+int nRF24L01_fifoNotEmpty(nRF24L01 *module) {
+	uint8_t reg = 0x00;
+
+	nRF24L01_readRegister(module, STATUS, &reg, 1);
+	if (reg & STATUS_RX_DR)
+		return 1;
+
+	return 0;
+}
+
 int nRF24L01_pollForTXPacketWithTimeout(nRF24L01 *module, uint32_t timeout_ms) {
 	uint8_t rc = 0;
 	uint8_t status = 0x00;
