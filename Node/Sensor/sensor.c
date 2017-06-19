@@ -27,11 +27,15 @@ void sensor_addDiscoverableSensor(LListElement **head, I2C_HandleTypeDef *hi2c, 
 	}
 }
 
-void sensor_addSensor(LListElement **head, I2C_HandleTypeDef *hi2c, Sensor_I2C_Probe_Intf *probe_intf, uint32_t sampling_period_s) {
+void sensor_addSensor(LListElement **head, ADC_HandleTypeDef *hadc, I2C_HandleTypeDef *hi2c, struct_sensor_list *sensor_list, uint32_t sampling_period_s) {
 	Sensor *sensor = (Sensor*)malloc(sizeof(Sensor));
 	if (sensor == NULL) return;
 
-	if (probe_intf->init(sensor, hi2c, sampling_period_s) == 0) {
+	void * handler = (sensor_list->interface == SI_I2C) ? (void*) hi2c :
+					 (sensor_list->interface == SI_Analog) ? (void*) hadc :
+					 hadc;
+
+	if (sensor_list->probe_intf->init(sensor, handler, sampling_period_s) == 0) {
 		sensor->func_tbl->init(sensor);
 
 		if (*head == NULL) {
@@ -68,4 +72,8 @@ void sensor_setSamplingPeriod(Sensor *sensor, uint16_t sampling_period_s) {
 	} else{
 		sensor->sampling_period_s = sampling_period_s;
 	}
+}
+
+Sensor* sensor_createSensor() {
+	return (Sensor*) malloc(sizeof(Sensor));
 }

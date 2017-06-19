@@ -10,18 +10,19 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include "LDR.h"
+#include "VBAT.h"
 #include <string.h>
 
 I2C_HandleTypeDef hi2c;
 DMA_HandleTypeDef hdma;
 UART_HandleTypeDef huart;
 RTC_HandleTypeDef hrtc;
-extern struct_sensor_list available_sensors[];
+ADC_HandleTypeDef hadc;
 
 #define MIN_WAKEUP_PERIOD_S		1
 #define PAYLOAD_QUEUE_MAX_LEN	10
-#define ACK_QUEUE_MAX_LEN		5
+#define ACK_QUEUE_MAX_LEN		10
 
 void* LList_GetElementById(LListElement *head, uint8_t sensorID){
 	if(head == NULL) return NULL;
@@ -51,10 +52,16 @@ int Node_init(Node *node, uint32_t id) {
 		// Init peripherals
 		rc |= i2c_init(&hi2c, &hdma);
 		rc |= rtc_init(&hrtc);
-		Sensor* sensor;
+		rc |= adc_init(&hadc);
 
+		Sensor* sensor;
 		// Discover Sensors
 		sensor_discoverDevicesOnI2CBus(&node->sensor_list, &hi2c);
+
+		// Force analog sensors
+
+		//sensor_addSensor(&node->sensor_list, &hadc, &hi2c, &available_sensors[4], 0);
+		//sensor_addSensor(&node->sensor_list, &hadc, &hi2c, &available_sensors[5], 0);
 
 		// Wake microcontroller
 		rtc_setup_wakeup_interrupt(&hrtc, MIN_WAKEUP_PERIOD_S);
@@ -76,7 +83,7 @@ int Node_init(Node *node, uint32_t id) {
 						index = sensorList_getIndex(node->configuration.sensor_config[i].Sensor_ID);
 						//If sensor is available, load it:
 						if(index >= 0){
-							sensor_addSensor(&node->sensor_list,&hi2c, available_sensors[index].probe_intf, node->configuration.sensor_config[i].Sensor_period);
+							sensor_addSensor(&node->sensor_list, &hadc, &hi2c, &available_sensors[index], node->configuration.sensor_config[i].Sensor_period);
 						}
 					}
 
@@ -216,7 +223,7 @@ void Node_handleCFGPayload(Node *node, Comms_Payload ACK_Payload){
 
 		if(!sensor){
 			index = sensorList_getIndex(sensor_ptr[0]);
-			sensor_addSensor(&sensor_list, &hi2c, available_sensors[index].probe_intf, period);
+			sensor_addSensor(&sensor_list, &hadc, &hi2c, &available_sensors[index], period);
 		}
 
 		sensor_setSamplingPeriod(sensor, period);
@@ -279,5 +286,3 @@ void Node_task(void *param) {
 		node->current_sample++; // Increment current sample
 	}
 }
-
-

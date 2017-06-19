@@ -62,7 +62,7 @@ int Node_loadConfiguration(Node* node) {
 			  valid = 0;
 
 		  if (valid) {
-			  node->configuration.sensor_config[i].Sensor_ID = data;
+			  node->configuration.sensor_config[i].Sensor_ID = id;
 			  node->configuration.sensor_config[i].Sensor_period = period;
 		  }
 	  }

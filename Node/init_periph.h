@@ -17,5 +17,6 @@ int uart_init(UART_HandleTypeDef *huart);
 int rtc_init(RTC_HandleTypeDef *rtc);
 int rtc_setup_wakeup_interrupt(RTC_HandleTypeDef *rtc, uint32_t period_s);
 int gpio_init();
+int adc_init(ADC_HandleTypeDef *hadc);
 
 #endif /* INIT_PERIPH_H_ */

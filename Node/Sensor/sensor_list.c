@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 
-Sensor_I2C_Probe_Intf *discoverable_devices[]= {
+Sensor_Probe_Intf *discoverable_devices[]= {
 	&LSM9DS1_M_intf,
 	&LSM9DS1_AG_intf,
 	&HTS221_intf,
@@ -21,22 +21,37 @@ Sensor_I2C_Probe_Intf *discoverable_devices[]= {
 struct_sensor_list available_sensors[] = {
 		{
 				HTS221_ID,
+				SI_I2C,
 				&HTS221_intf
 		},
 		{
 				LPS25H_ID,
+				SI_I2C,
 				&LPS25H_intf
 		},
 		{
 				LSM9DS1_AG_ID,
+				SI_I2C,
 				&LSM9DS1_AG_intf
 		},
 		{
 				LSM9DS1_M_ID,
+				SI_I2C,
 				&LSM9DS1_M_intf
 		},
 		{
+				VBAT_ID,
+				SI_Analog,
+				&VBAT_intf
+		},
+		{
+				LDR_ID,
+				SI_Analog,
+				&LDR_intf
+		},
+		{
 				0x00,
+				SI_Custom,
 				NULL
 		}
 };

@@ -113,7 +113,6 @@ int nRF24L01_setMode(nRF24L01 *module, nRF24L01_Mode mode) {
 int nRF24L01_transmit(nRF24L01 *module, uint8_t *payload) {
 	uint8_t rc = 0;
 	rc = nRF24L01_writePayload(module, payload, 32); // 32 bytes payload
-#warning TODO: Implement CE signal with timer
 	HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_SET);
 	vTaskDelay(1/portTICK_PERIOD_MS);
 	HAL_GPIO_WritePin(module->CE.port, module->CE.pin, GPIO_PIN_RESET);

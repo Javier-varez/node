@@ -17,9 +17,9 @@ typedef struct {
 	float temperature;	// Temperatura: °C
 } LPS25H_Out_Data;
 
-int LPS25H_init(Sensor *sensor, I2C_HandleTypeDef *hi2c, uint16_t sampling_period_s);
+int LPS25H_init(struct sensor_struct *sensor, void *handler, uint16_t sampling_period_s);
 int LPS25H_remove(Sensor *sensor);
 
-extern Sensor_I2C_Probe_Intf LPS25H_intf;
+extern Sensor_Probe_Intf LPS25H_intf;
 
 #endif /* LPS25H_H_ */

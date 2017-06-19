@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-Sensor_I2C_Probe_Intf LSM9DS1_M_intf = {
+Sensor_Probe_Intf LSM9DS1_M_intf = {
 	.init = LSM9DS1_M_init,
 	.remove = LSM9DS1_M_remove
 };
@@ -190,9 +190,9 @@ static Sensor_Func_Table LSM9DS1_M_func_table = {
 };
 
 
-int LSM9DS1_M_init(Sensor *sensor, I2C_HandleTypeDef *hi2c, uint16_t sampling_period_s) {
-	uint8_t rc = i2c_sensor_init(sensor, "LSM9DS1_M",LSM9DS1_M_ID, &LSM9DS1_M_func_table, hi2c, LSM9DS1_M_DEV_ADDR << 1, &LSM9DS1_M_init_array,
-								 OUT_X_L, sizeof(uint8_t), 3*sizeof(int16_t), WHO_AM_I, LSM9DS1_M_ID_VALUE, DEFAULT_PERIOD_S | sampling_period_s);
+int LSM9DS1_M_init(struct sensor_struct *sensor, void* handler, uint16_t sampling_period_s) {
+	uint8_t rc = i2c_sensor_init(sensor, "LSM9DS1_M",LSM9DS1_M_ID, &LSM9DS1_M_func_table, (I2C_HandleTypeDef*)handler, LSM9DS1_M_DEV_ADDR << 1, &LSM9DS1_M_init_array,
+								 OUT_X_L, sizeof(uint8_t), 3*sizeof(int16_t), WHO_AM_I, LSM9DS1_M_ID_VALUE, sampling_period_s ? sampling_period_s : DEFAULT_PERIOD_S);
 
 	if (rc == HAL_OK) {
 		sensor->out_data = malloc(sizeof(LSM9DS1_M_Out_Data));

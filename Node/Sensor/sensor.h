@@ -21,13 +21,6 @@
 #define NAME_MAXLEN 15
 #define sensor_delay(x) (vTaskDelay(x/portTICK_PERIOD_MS))
 
-typedef enum {
-	SI_Analog,
-	SI_Digital,
-	SI_I2C,
-	SI_Custom,
-} Sensor_Interface;
-
 struct sensor_struct;
 typedef struct sensor_struct Sensor;
 
@@ -58,8 +51,9 @@ struct sensor_struct {
 };
 
 void sensor_addDiscoverableSensor(LListElement **head, I2C_HandleTypeDef *hi2c, uint8_t index);
-void sensor_addSensor(LListElement **head, I2C_HandleTypeDef *hi2c, Sensor_I2C_Probe_Intf *probe_intf, uint32_t sampling_period_s);
+void sensor_addSensor(LListElement **head, ADC_HandleTypeDef *hadc, I2C_HandleTypeDef *hi2c, struct_sensor_list *sensor_list, uint32_t sampling_period_s);
 void sensor_readSensors(LListElement *head, uint32_t id);
 void sensor_setSamplingPeriod(Sensor *sensor, uint16_t sampling_time_s);
+Sensor * sensor_createSensor();
 
 #endif /* SENSOR_H_ */
