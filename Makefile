@@ -1,5 +1,4 @@
-TARGET = test_node
-
+TARGET = node
 #######################
 # Build configuration #
 #######################
